@@ -1,0 +1,93 @@
+[
+    {
+      "id": 1,
+      "title": "Laptop",
+      "description": "hp ryzen 5500",
+      "price": 800,
+      "thumbnail": "ruta",
+      "code": 1,
+      "stock": 10
+    },
+    {
+      "id": 2,
+      "title": "Laptop",
+      "description": "DELL ryzen 5500",
+      "price": 800,
+      "thumbnail": "ruta",
+      "code": 2,
+      "stock": 10
+    },
+    {
+      "id": 3,
+      "title": "Tablet",
+      "description": "Samsung Tab A",
+      "price": 300,
+      "thumbnail": "ruta",
+      "code": 3,
+      "stock": 10
+    },
+    {
+      "id": 4,
+      "title": "Smartphone",
+      "description": "iPhone 13",
+      "price": 1200,
+      "thumbnail": "ruta",
+      "code": 4,
+      "stock": 8
+    },
+    {
+      "id": 5,
+      "title": "Smart TV",
+      "description": "Samsung 4K",
+      "price": 1000,
+      "thumbnail": "ruta",
+      "code": 5,
+      "stock": 15
+    },
+    {
+      "id": 6,
+      "title": "Cámara",
+      "description": "Canon EOS Rebel T7",
+      "price": 500,
+      "thumbnail": "ruta",
+      "code": 6,
+      "stock": 12
+    },
+    {
+      "id": 7,
+      "title": "Auriculares",
+      "description": "Sony WH-1000XM4",
+      "price": 300,
+      "thumbnail": "ruta",
+      "code": 7,
+      "stock": 20
+    },
+    {
+      "id": 8,
+      "title": "Teclado",
+      "description": "Logitech G Pro X",
+      "price": 150,
+      "thumbnail": "ruta",
+      "code": 8,
+      "stock": 18
+    },
+    {
+      "id": 9,
+      "title": "Mouse",
+      "description": "Razer DeathAdder Elite",
+      "price": 80,
+      "thumbnail": "ruta",
+      "code": 9,
+      "stock": 25
+    },
+    {
+      "id": 10,
+      "title": "Monitor",
+      "description": "Dell Ultrasharp U2719D",
+      "price": 400,
+      "thumbnail": "ruta",
+      "code": 10,
+      "stock": 15
+    }
+  ]
+  

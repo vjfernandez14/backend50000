@@ -1,5 +1,6 @@
 const fs = require('fs');
 
+
 class ProductManager {
     
     constructor(ruta) {
@@ -38,40 +39,39 @@ class ProductManager {
     
     }
 
-    getProducts(){
+    async getProducts(){
         
-        fs.readFile(this.path,'utf-8',(error,resultado)=>{
-            if(error) {
-                return console.log(this.products)
-            } else{
-                if (!this.products) return console.log('No se pudo obtener los productos')
-                this.products = JSON.parse(resultado);
-                return this.products;
+        let products= []
+        try {
+           const data = await fs.promises.readFile(this.path,'utf-8');
+           products = JSON.parse(data);
+           console.log(products)
+           return products
+        } catch (error) { 
+            return products
+        }          
+    }
+
+
+
+    async getProductById(id) {
+        
+        try {
+            const data = await fs.promises.readFile(this.path, 'utf-8');
+            const products = JSON.parse(data);
+            const productFound = products.find(product => product.id === id);
+    
+            if (productFound) {
+                console.log(productFound)
+                return productFound;
+            } else {
+               return console.log( 'Not found');
             }
-        });
-          
+        } catch (error) {
+            throw new Error('No se encontró el producto');
+        }
     }
-
-     getProductById(id){
-
-        
-            fs.readFile(this.path,'utf-8',(error,resultado)=>{
-                
-                if(error) return console.log('Error al buscar los datos');
-                    
-                //parseamos los datos extraidos 
-                    this.products = JSON.parse(resultado);
-                    const productsFound = this.products.find(products => products.id === id);
-
-                    if(productsFound)  return productsFound
-                        
-                        console.log('Not found')
-                    
-                
-            });
-
-        
-    }
+    
 
     updateProduct (id,title,description,price,thumbnail,code,stock){
         fs.readFile(this.path,'utf-8',(error,resultado)=>{
@@ -144,8 +144,10 @@ const productCreate = new ProductManager('./products.json');
 
 //productCreate.addProduct('Laptop','hp ryzen 5500',800,'ruta',10,1);
 //productCreate.addProduct('Laptop','DELL ryzen 5500',800,'ruta',10,2);
-
+  
 //productCreate.getProductById(2); 
 //productCreate.updateProduct(2,'nuevo titulos','otra marca');
 //productCreate.deleteProduct(2);
 //productCreate.getProducts()
+ 
+module.exports = ProductManager;
