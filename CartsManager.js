@@ -61,6 +61,7 @@ class CartsManager {
             carts[index] = cart;
     
             await fs.writeFile(this.path, JSON.stringify(carts, null, 2));
+            return carts;
         } catch (error) {
             throw new Error('Error al guardar el carrito');
         }
