@@ -1,0 +1,15 @@
+<h2>Lista de productos</h2>
+
+  {{#each products}}
+    <div>
+      <h5>Nombre: {{this.title}}</h5>
+      <p>Precio: {{this.price}}</p>
+      <p>Descriocion: {{this.description}}</p>
+
+      <hr>
+    </div>
+
+  {{/each}}
+
+
+<script type="text" src="../public/js/products.js"></script>

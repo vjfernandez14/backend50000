@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const handlebars = require('express-handlebars')
 
 
 const ProductManager = require('../../ProductManager');
@@ -99,6 +100,30 @@ router.delete('/:pid', async (req, res) => {
         }
     }
 });
+
+router.get('/home/home', async (req, res) => {
+    try {
+        const products = await productManager.getProducts();
+        console.log(products)
+        res.render('home.handlebars', { products });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener los productos para la vista home' });
+    }
+});
+
+router.get('/home/realtimeproducts', async (req, res) => {
+    try {
+        const products = await productManager.getProducts();
+        console.log(products)
+        res.render('realTimeProducts.handlebars', { products });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener los productos para la vista home' });
+    }
+});
+
+
 
 
 module.exports = router;

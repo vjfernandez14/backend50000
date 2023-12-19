@@ -1,0 +1,46 @@
+<h2>Lista de productos</h2>
+
+
+<form id="createProductForm">
+<label for="productTitle">Título del Producto:</label>
+  <input type="text" id="productTitle" name="productTitle" required>
+    <br>
+  <label for="productDescription">Descripción del Producto:</label>
+  <textarea id="productDescription" name="productDescription" required></textarea>
+
+  <label for="productPrice">Precio del Producto:</label>
+  <input type="number" id="productPrice" name="productPrice" required>
+  <button type="button" onclick="createProduct()">Crear Producto</button>
+</form>
+
+
+<form id="deleteProductForm">
+  <label for="productIdToDelete">ID del Producto a Eliminar:</label>
+  <input type="text" id="productIdToDelete" name="productIdToDelete" required>
+  <button type="button" onclick="deleteProduct()">Eliminar Producto</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  function deleteProduct() {
+    const productIdToDelete = document.getElementById('productIdToDelete').value;
+    socket.emit('deleteProduct', { id: productIdToDelete });
+  }
+</script>
+
+
+  {{#each products}}
+    <div>
+      <h5>Nombre: {{this.title}}</h5>
+      <p>Precio: {{this.price}}</p>
+      <p>Descriocion: {{this.description}}</p>
+
+      <hr>
+    </div>
+
+  {{/each}}
+
+
+<script type="text" src="../public/js/products.js"></script>
