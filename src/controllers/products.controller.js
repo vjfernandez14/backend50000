@@ -123,6 +123,21 @@ router.get('/home/realtimeproducts', async (req, res) => {
     }
 });
 
+router.post('/home/realtimeproducts', async (req, res) => {
+    try {
+        const { title, description, price, stock, code, status = true, category, thumbnail } = req.body;
+
+        
+        const check = await productManager.addProduct(title, description, price, stock, code, status, category, thumbnail);
+        if (check) {
+            res.send('Producto cargado');
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 
 
 

@@ -7,7 +7,7 @@ const app = express();
 //console.log(process.cwd())
 
 app.use(express.json())
-app.use(express.static(process.cwd() + './src/public'))
+app.use(express.static(process.cwd() + '/src/public'))
 
 router(app)
 
