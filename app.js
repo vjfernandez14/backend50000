@@ -1,15 +1,19 @@
-
+const express = require('express')
 const app = require('./server')
 const handlebars = require('express-handlebars')
 const port = 8080;  
 const {Server} = require('socket.io')
 const router = require('./src/router/index')
 const axios = require('axios');
+const mongoConnect = require('./src/db');
+const messagesModel = require('./src/models/messages.model');
 
 
 
+const chats = []
 app.engine('handlebars', handlebars.engine())
 app.set('views', process.cwd() + '/src/views')
+
 
 
 
@@ -20,6 +24,8 @@ app.get('/products', (req, res) => {
 const httpServer = app.listen(port,()=>{
     console.log('running server...')
 })
+
+mongoConnect()
 
 const io = new Server(httpServer) 
 
@@ -80,6 +86,29 @@ io.on('connection',socket => {
             }
         } catch (error) {
             console.error('Error en la solicitud:', error.message);
+        }
+    });
+
+    socket.on('newUser', data => {
+        socket.broadcast.emit('userConected', data)
+        socket.emit('messageLogs', chats)
+    })
+
+    socket.on('message', async data => {
+        chats.push(data);
+    
+        io.emit('messageLogs', chats);
+    
+        try {
+            const newMessage = {
+                User: data.username,
+                Message: data.message
+            };
+    
+            await messagesModel.create(newMessage)
+            console.log('Mensaje guardado:', newMessage);
+        } catch (error) {
+            console.error('Error al guardar el mensaje:', error);
         }
     });
 }) 
