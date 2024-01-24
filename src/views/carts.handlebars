@@ -1,0 +1,25 @@
+<h1>Carro de compra</h1>
+
+<div class="row">
+    {{#each cart.products}}
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title col-md-4">Nombre: {{this.productId.title}}</h5>
+                    <p class="card-text col-md-4">Precio: {{this.productId.price}}</p>
+                    <p class="card-text col-md-4">Cantidad: {{this.quantity}}</p>
+                    <hr>
+            
+                    <form action="/eliminar-al-carrito" method="POST">
+                        <input type="hidden" name="productId" value="{{this.productId._id}}">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+
+    <div class="col-md-12">
+        <h2>Total: {{total}}</h2>
+    </div>
+</div>

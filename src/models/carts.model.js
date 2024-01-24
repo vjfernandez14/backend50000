@@ -7,8 +7,13 @@ const cartsShema = new mongoose.Schema({
         type: String,
         unique: true
     },
-    products: [{ productId: String, quantity: Number }]
-})  
+         products: [{ 
+                productId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'products' // Referencia al modelo de productos
+                }, 
+                    quantity: Number }]
+     })      
 
 const cartsModel = mongoose.model(cartsCollection, cartsShema)
 

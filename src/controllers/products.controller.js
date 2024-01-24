@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const handlebars = require('express-handlebars')
+const mongoosePaginate = require('mongoose-paginate-v2')
 
 
 
@@ -8,19 +9,74 @@ const handlebars = require('express-handlebars')
 const productsMangerMongo = require('../dao/productsMangerMongo')
 const ProductManager = require('../../ProductManager');
 const productsModel = require('../models/products.model');
-const messagesModel = require('../models/messages.model')
+const messagesModel = require('../models/messages.model');
+
+
 
 const productManager = new ProductManager('products.json');
 const productManagerMongo = new productsMangerMongo()
 
 router.get('/', async (req, res) => {
-    try{
-        const products = await productManagerMongo.getProducts()
-        console.log(products)
-    }catch(error){
-        console.log(error)
+    try {
+        const { limit = 10, page = 1, sort, query } = req.query;
+
+        // Construir el objeto de opciones para la consulta paginada
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: parseInt(sort) ? { [sort]: 1 } : { [sort]: -1 } ,
+            lean: true, 
+        };
+        console.log(options)
+
+        // Construir el objeto de filtro para la consulta
+        const filter = query ? { category: query } : {}; // Esto es un ejemplo, ajusta según tus necesidades
+
+        // Realizar la consulta paginada
+        const { docs, hasPrevPage, hasNextPage, nextPage, prevPage, totalPages } = await productsModel.paginate(filter, options);
+        telefonia = docs
+        console.log(docs)
+        res.render("telefonia.handlebars", {
+            telefonia,
+            hasPrevPage,
+            hasNextPage,
+            nextPage,
+            prevPage,
+            query,
+            limit,
+        });
+        
+        const response = {
+            status: 'success',
+            payload: docs,
+            totalPages: totalPages,
+            prevPage: prevPage,
+            nextPage: nextPage,
+            page: page,
+            hasPrevPage: hasPrevPage,
+            hasNextPage: hasNextPage,
+            prevLink: hasPrevPage ? `/telefonia?page=${prevPage}&limit=${limit}` : null,
+            nextLink: hasNextPage ? `/telefonia?page=${nextPage}&limit=${limit}` : null,
+        };
+
+        console.log(response)
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
-})
+});
+
+
+//router.get('/', async (req, res) => {
+    //try{
+        //const products = await productManagerMongo.getProducts()
+       // console.log(products)
+   // }catch(error){
+       // console.log(error)
+    //}
+//})
+
+
 
 //router.get('/', async (req,res)=>{
 //
@@ -187,6 +243,8 @@ router.delete('/:pid', async (req, res) => {
         //}
     //}
 //});
+
+
 
 router.get('/home/home', async (req, res) => {
     try {

@@ -11,8 +11,13 @@ const messagesModel = require('./src/models/messages.model');
 
 
 const chats = []
-app.engine('handlebars', handlebars.engine())
-app.set('views', process.cwd() + '/src/views')
+app.engine('handlebars', handlebars.engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true, 
+    }
+}))
+app.set('views', process.cwd() + '/src/views')  
 
 
 
