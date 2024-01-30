@@ -36,6 +36,15 @@ router.get('/', async (req, res) => {
         const { docs, hasPrevPage, hasNextPage, nextPage, prevPage, totalPages } = await productsModel.paginate(filter, options);
         telefonia = docs
         console.log(docs)
+
+        if (!req.session.user) {
+            return res.redirect('/'); // O redirige a la página de inicio de sesión si no está autenticado
+        }
+        
+    
+        const userData = req.session.user;
+    
+
         res.render("telefonia.handlebars", {
             telefonia,
             hasPrevPage,
@@ -44,6 +53,7 @@ router.get('/', async (req, res) => {
             prevPage,
             query,
             limit,
+            user: userData,
         });
         
         const response = {
@@ -114,7 +124,9 @@ router.get('/:pid', async (req, res) => {
     }
 });
 
-//router.get('/:pid', async (req,res)=>{  
+
+
+    //router.get('/:pid', async (req,res)=>{  
 
     //try {
       //  const { pid } = req.params;
