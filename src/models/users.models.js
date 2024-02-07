@@ -12,6 +12,8 @@ const usersShema = new mongoose.Schema({
         enum: ['user', 'admin'], 
         default: 'user', 
     },
+    githubId: Number,
+    githubUsername: String,
 
 })
 

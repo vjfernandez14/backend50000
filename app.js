@@ -7,6 +7,8 @@ const router = require('./src/router/index')
 const axios = require('axios');
 const mongoConnect = require('./src/db');
 const messagesModel = require('./src/models/messages.model');
+const initializePassport = require('./src/configs/passport.config');
+const passport = require('passport');
 
 
 
@@ -33,6 +35,9 @@ const httpServer = app.listen(port,()=>{
 })
 
 mongoConnect()
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 const io = new Server(httpServer) 
 

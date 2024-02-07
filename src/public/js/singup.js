@@ -4,15 +4,14 @@ form.addEventListener('submit', e => {
     e.preventDefault()
 
     const data = new FormData(form)
-    console.log(data)   
     const obj = {}
 
-    data.forEach((value,key) => (obj[key] = value))
+    data.forEach((value, key) => (obj[key] = value))
 
     const fetchParams = {
         url: '/api/users/singup',
         headers: {
-            'content-type':'application/json',
+            'content-type': 'application/json',
         },
         method: 'POST',
         body: JSON.stringify(obj),
@@ -23,8 +22,23 @@ form.addEventListener('submit', e => {
         method: fetchParams.method,
         body: fetchParams.body,
     })
-    
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.log(error))
-})
+        .then(response => response.json())
+        .then(data => {
+            // Mostrar SweetAlert2 cuando la solicitud sea exitosa
+            Swal.fire({
+                icon: 'success',
+                title: 'Registro exitoso',
+                text: '¡El usuario se ha registrado correctamente!',
+            });
+            console.log(data);
+        })
+        .catch(error => {
+            // Mostrar SweetAlert2 en caso de error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un problema durante el registro. Por favor, inténtalo de nuevo.',
+            });
+            console.log(error);
+        });
+});

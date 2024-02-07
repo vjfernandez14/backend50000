@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const handlebars = require('express-handlebars')
 const Users = require('../models/users.models')
+const { useValidPassword } = require('../utils/crypt-password.util')
+const passport = require('passport')
 
 
 
@@ -10,30 +12,14 @@ router.get('/', (req, res) => {
     res.render('login.handlebars')
 })
 
-router.post('/', async (req,res) => {
+router.post('/', passport.authenticate('login', {failureRedirect: '/api/users/login/fail-login'}), async (req,res) => {
     try {
-        const { email, password} = req.body
-
-       
-        const user = await Users.findOne({email})
-            console.log(user)
-
-        if(!user) return res.status(400).json({message: 'bad Request'})
-
-        if(user.password !== password) return res.status(400).json({message: 'bad Request'})
-
-        if (user.email === 'adminCoder@coder.com' && user.password === 'adminCod3r123') {
-            user.role = 'admin';
-        }
-
         req.session.user = {
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            role: user.role,
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            email: req.user.email,
+            role: req.user.role,
         }
-
-
 
         res.redirect('/api/products')
 
@@ -41,6 +27,10 @@ router.post('/', async (req,res) => {
         } catch (error) {
         res.status(500).json({status: 'success', message: 'Internal Server error'})
     }
+})
+
+router.get('/fail-login', (req,res) => {
+    res.status(400).json({status: 'error', error: 'Bad request'})
 })
 
 router.get('/logout', (req, res) => {
@@ -59,5 +49,15 @@ router.get('/logout', (req, res) => {
         res.redirect('/api/users/login');
     });
 });
+
+router.get('/github', passport.authenticate('github', {scope:['user: email']}), (req,res) => {
+    
+})
+
+
+router.get('/githubcallback', passport.authenticate('github', {failureRedirect: '/'}), (req,res) => {
+    req.session.user = req.user
+    res.redirect('/api/products')
+})
 
 module.exports = router
