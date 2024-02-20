@@ -13,6 +13,8 @@ router.get('/singup', (req, res) => {
     res.render('singup.handlebars')
 })
 
+
+
 router.post('/singup', passport.authenticate('register',{failureRedirect: '/fail-register'}) , async (req,res) => {
     try {
                     

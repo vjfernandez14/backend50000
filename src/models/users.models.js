@@ -5,13 +5,22 @@ const usersCollection = 'user'
 const usersShema = new mongoose.Schema({
     first_name: String,
     last_name: String,
-    email: String,
+    email: {
+        type: String,
+        unique: true,
+    },
     password: String,
+    age: Number,
     role: {
         type: String,
         enum: ['user', 'admin'], 
         default: 'user', 
     },
+    cart: [{ 
+        cartId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'carts',
+        },  }],
     githubId: Number,
     githubUsername: String,
 

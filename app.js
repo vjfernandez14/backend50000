@@ -9,7 +9,8 @@ const mongoConnect = require('./src/db');
 const messagesModel = require('./src/models/messages.model');
 const initializePassport = require('./src/configs/passport.config');
 const passport = require('passport');
-
+const initializePassportJwt = require('./src/configs/passport.config');
+ 
 
 
 
@@ -36,6 +37,7 @@ const httpServer = app.listen(port,()=>{
 
 mongoConnect()
 initializePassport()
+initializePassportJwt()
 app.use(passport.initialize())
 app.use(passport.session())
 

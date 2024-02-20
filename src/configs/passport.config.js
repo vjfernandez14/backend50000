@@ -4,9 +4,50 @@ const Users = require('../models/users.models')
 const { createHash, useValidPassword } = require('../utils/crypt-password.util')
 const GitHubStrategy = require('passport-github2').Strategy
 const { ghClientId, ghClientSecret } = require('./client')
+const jwt = require('passport-jwt')
+const cookieExtractor = require('../utils/cookie-extractor.util')
+const { generateToken } = require('../utils/token.util')
 
 
 const LocalStrategy = local.Strategy
+const JWTStrategy = jwt.Strategy
+
+const initializePassportJwt = () => {
+    passport.use('jwt', new JWTStrategy({
+        jwtFromRequest: jwt.ExtractJwt.fromExtractors([cookieExtractor]),
+        secretOrKey: 'MiCodigo',
+    },
+    (jwt_payload, done) => {
+        try {
+            done(null, jwt_payload)
+        } catch (error) {
+            done(error)
+        }
+    }
+    ))
+    
+}
+
+passport.use('current', new JWTStrategy({
+    jwtFromRequest: jwt.ExtractJwt.fromExtractors([cookieExtractor]),
+    secretOrKey: 'MiCodigo',
+},
+async (jwt_payload, done) => {
+    try {
+        const user = await Users.findById(jwt_payload.user.id);
+        console.log(user)
+        console.log(jwt_payload)
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false, { message: 'Usuario no encontrado' });
+        }
+    } catch (error) {
+        return done(error);
+    }
+}
+));
+
 
 const initializePassport = () => {
     passport.use('register', new LocalStrategy(
@@ -41,7 +82,7 @@ const initializePassport = () => {
 
 passport.use('login', new LocalStrategy(
     {usernameField: 'email'},
-     async (username, password, done) => {
+     async ( username, password, done) => {
         try {
             const user = await Users.findOne({email: username})
             console.log(user)
@@ -55,6 +96,8 @@ passport.use('login', new LocalStrategy(
             console.log('contraseña incorrecta')
             return done(null,false)
         }
+        
+        
 
         if (user.email === 'adminCoder@coder.com' && user.password === 'adminCod3r123') {
             user.role = 'admin';
@@ -107,3 +150,4 @@ passport.serializeUser((user, done) => {
   })
 
 module.exports = initializePassport
+module.exports = initializePassportJwt

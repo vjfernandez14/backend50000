@@ -4,13 +4,28 @@ const handlebars = require('express-handlebars')
 const Users = require('../models/users.models')
 const { useValidPassword } = require('../utils/crypt-password.util')
 const passport = require('passport')
+const { generateToken } = require('../utils/token.util')
+const { authToken } = require('../utils/token.util')
 
 
 
 
 router.get('/', (req, res) => {
-    res.render('login.handlebars')
-})
+    
+    if (req.cookies.authToken) {
+        res.redirect('/api/products');
+    } else {
+        
+        res.render('login.handlebars');
+    }
+});
+
+router.get('/current', passport.authenticate('current', { session: false }), (req, res) => {
+    // La autenticación ha sido exitosa y req.user contiene la información del usuario
+    //res.json({ user: req.user });
+    user = req.user
+    res.render('profile.handlebars', { user })
+});
 
 router.post('/', passport.authenticate('login', {failureRedirect: '/api/users/login/fail-login'}), async (req,res) => {
     try {
@@ -21,7 +36,18 @@ router.post('/', passport.authenticate('login', {failureRedirect: '/api/users/lo
             role: req.user.role,
         }
 
-        res.redirect('/api/products')
+       //res.redirect('/api/products')
+       const token = generateToken({ id: req.user.id, role: req.user.role})
+
+        
+
+
+       res.cookie('authToken', token, {
+           maxAge: 60000,
+           httpOnly: true,
+       }).redirect('/api/products')
+
+        
 
            
         } catch (error) {
@@ -59,5 +85,7 @@ router.get('/githubcallback', passport.authenticate('github', {failureRedirect: 
     req.session.user = req.user
     res.redirect('/api/products')
 })
+
+
 
 module.exports = router
