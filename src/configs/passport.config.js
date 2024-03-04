@@ -7,26 +7,14 @@ const { ghClientId, ghClientSecret } = require('./client')
 const jwt = require('passport-jwt')
 const cookieExtractor = require('../utils/cookie-extractor.util')
 const { generateToken } = require('../utils/token.util')
+const initializePassportJwt = require('./passport-jwt.config')
+const UsersDao = require('../dao/Users.dao')
 
 
 const LocalStrategy = local.Strategy
 const JWTStrategy = jwt.Strategy
 
-const initializePassportJwt = () => {
-    passport.use('jwt', new JWTStrategy({
-        jwtFromRequest: jwt.ExtractJwt.fromExtractors([cookieExtractor]),
-        secretOrKey: 'MiCodigo',
-    },
-    (jwt_payload, done) => {
-        try {
-            done(null, jwt_payload)
-        } catch (error) {
-            done(error)
-        }
-    }
-    ))
-    
-}
+
 
 passport.use('current', new JWTStrategy({
     jwtFromRequest: jwt.ExtractJwt.fromExtractors([cookieExtractor]),
@@ -50,13 +38,14 @@ async (jwt_payload, done) => {
 
 
 const initializePassport = () => {
+    usersDao = new UsersDao
     passport.use('register', new LocalStrategy(
         {passReqToCallback: true, usernameField: 'email'},
         async (req, username, password, done) => {
         try {
             const {first_name, last_name, email} = req.body
-            const user = await Users.findOne({email: email})
-            if(user){
+            const user = await usersDao.find({email: email})
+            if(user){   
                 console.log('User exists')
                 return done(null, false)
             }
@@ -68,7 +57,7 @@ const initializePassport = () => {
                 password: createHash(password),    
             }
 
-            const newUser = await Users.create(newUserInfo)
+            const newUser = await usersDao.createUser(newUserInfo)
             return done(null, newUser)
                 
             } catch (error) {
@@ -83,8 +72,9 @@ const initializePassport = () => {
 passport.use('login', new LocalStrategy(
     {usernameField: 'email'},
      async ( username, password, done) => {
+        usersDao = new UsersDao
         try {
-            const user = await Users.findOne({email: username})
+            const user = await usersDao.find({email: username})
             console.log(user)
 
         if(!user) {
@@ -116,10 +106,10 @@ passport.use('login', new LocalStrategy(
     }, async (accessToken, refreshToken, profile, done) => {
         try {
             console.log(profile)
-    
+            usersDao = new UsersDao
             const { id, login, name, email } = profile._json
     
-            const user = await Users.findOne({ email: email }) // Aquí corregí de 'username' a 'email'
+            const user = await usersDao.find({ email: email }) // Aquí corregí de 'username' a 'email'
             if (!user) {
                 const newUserInfo = {
                     first_name: name,
@@ -128,7 +118,7 @@ passport.use('login', new LocalStrategy(
                     githubUsername: login,
                 }
     
-                const newUser = await Users.create(newUserInfo)
+                const newUser = await usersDao.createUser(newUserInfo)
                 return done(null, newUser)
             }
     
@@ -150,4 +140,4 @@ passport.serializeUser((user, done) => {
   })
 
 module.exports = initializePassport
-module.exports = initializePassportJwt
+//module.exports = initializePassportJwt

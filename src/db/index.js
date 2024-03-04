@@ -1,8 +1,11 @@
+const { DB_KEY} = require('../configs/client')
+
 const mongoose = require('mongoose')
+
 
 const mongoConnect =  async () => {
     try{
-        await mongoose.connect('mongodb+srv://ecommerce:Victor&297@cluster0.ryjggq1.mongodb.net/ecommerce?retryWrites=true&w=majority')
+        await mongoose.connect(DB_KEY)
         console.log('conexion mongo')
     } catch(error){
         console.log(error)
