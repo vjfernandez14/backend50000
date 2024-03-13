@@ -2,6 +2,7 @@ const passport = require('passport');
 const local = require('passport-local');
 const Users = require('../models/users.models');
 const { createHash, useValidPassword } = require('../utils/crypt-password.util');
+const { createUser } = require('../services/users.service');
 
 const LocalStrategy = local.Strategy;
 
@@ -18,15 +19,10 @@ const initializePassportLocal = () => {
                     return done(null, false);
                 }
 
-                const newUserInfo = {
-                    first_name,
-                    last_name,
-                    email,
-                    password: createHash(password),
-                };
+                const newUserInfo = createUser(req.body)
 
-                const newUser = await Users.create(newUserInfo);
-                return done(null, newUser);
+                //const newUser = await Users.create(newUserInfo);
+                return done(null, newUserInfo);
 
             } catch (error) {
                 console.log(error);

@@ -14,52 +14,7 @@
     </div>
 </div>
 
- <div class="container col-md-12">
-<form id="createProductForm" method="post">
-    <div class="container">
-   <div class="row">
-        <div class="col-md-4">
-            <label for="productTitle" class="form-label">Título del Producto:</label>
-            <input type="text" class="form-control" id="productTitle" name="productTitle" required>
-        </div>
-        <div class="col-md-4">
-         <label for="productDescription" class="form-label">Descripción del Producto:</label>
-            <textarea class="form-control" id="productDescription" name="productDescription" required></textarea>
-        </div>
-        <div class="col-md-4">
-            <label for="productPrice" class="form-label">Precio del Producto:</label>
-            <input type="number" class="form-control" id="productPrice" name="productPrice" required>
-     </div>
-    </div>
-    <div class="row ">
-        <div class="col-md-4 form-check">
-            <input type="checkbox" class="form-check-input" id="productStatus" name="productStatus" required>
-            <label class="form-check-label" for="productStatus">Status</label>
-        </div>
-        <div class="col-md-4">
-            <label for="productStock" class="form-label">Stock:</label>
-            <input type="number" class="form-control" id="productStock" name="productStock" required>
-        </div>
-        <div class="col-md-4">
-            <label for="productCode" class="form-label">Code:</label>
-            <input type="number" class="form-control" id="productCode" name="productCode" required>
-        </div>
-    </div>
-    <div class="mb-3">
-        <label for="productCategory" class="form-label">Categoría:</label>
-        <input type="text" class="form-control" id="productCategory" name="productCategory" required>
-    </div>
-    <button type="button" class="btn btn-primary" onclick="createProduct()">Crear Producto</button>
-</form>
-</div>
-
-<form id="deleteProductForm" class="mt-4">
-    <div class="mb-3">
-        <label for="productIdToDelete" class="form-label">ID del Producto a Eliminar:</label>
-        <input type="text" class="form-control" id="productIdToDelete" name="productIdToDelete" required>
-    </div>
-    <button type="button" class="btn btn-danger" onclick="deleteProduct()">Eliminar Producto</button>
-</form>
+ 
 
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/js/products.js"></script>
@@ -67,25 +22,28 @@
 
 <div class="row">
     {{#each telefonia}}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Nombre: {{this.title}}</h5>
-                    <p class="card-text">Precio: {{this.price}}</p>
-                    <p class="card-text">Descripción: {{this.description}}</p>
-                    <hr>
-                    <form action="api/carts/65a75ab0e3dbdea179698fa7/product/{{this._id}}" method="POST">
-                        <input type="hidden" name="productId" value="{{this._id}}">
-        
-                        <input type="hidden" name="productName" value="{{this._id}}">
-                        <button type="submit" class="btn btn-primary">
-                            Agregar al carrito
-                        </button>
-                    </form>
-                </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Nombre: {{this.title}}</h5>
+                <p class="card-text">Precio: {{this.price}}</p>
+                <p class="card-text">Descripción: {{this.description}}</p>
+                <p class="card-text">Stock: {{this.stock}}</p>
+                
+                <form action="/api/carts/65a75ab0e3dbdea179698fa7/product/{{this._id}}" method="POST">
+                    <div class="form-group">
+                        <label for="quantity">Cantidad:</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="{{this.stock}}">
+                    </div>
+                    <input type="hidden" name="productId" value="{{this._id}}">
+                    <input type="hidden" name="productName" value="{{this._id}}">
+                    <input type="hidden" name="stock" value="{{this.stock}}">
+                    <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+                </form>
             </div>
         </div>
-    {{/each}}
+    </div>
+{{/each}}
 </div>
 
 

@@ -2,7 +2,7 @@
 
 <div class="row">
     {{#each cart.products}}
-        <div class="col-md-12 mb-4">
+        <div class="col-md-12 mb-4"> 
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title col-md-4">Nombre: {{this.productId.title}}</h5>
@@ -10,10 +10,10 @@
                     <p class="card-text col-md-4">Cantidad: {{this.quantity}}</p>
                     <hr>
             
-                    <form action="/eliminar-al-carrito" method="POST">
-                        <input type="hidden" name="productId" value="{{this.productId._id}}">
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
+                    
+                    <form id="delete-form-{{this._id}}" data-product-id="{{this.productId._id}}">
+                        <button type="button" class="btn btn-danger delete-button">Eliminar</button>
+                     </form>
                 </div>
             </div>
         </div>
@@ -21,5 +21,10 @@
 
     <div class="col-md-12">
         <h2>Total: {{total}}</h2>
+        <form action="/api/carts/{{cart._id}}/purchase" method="POST">
+            <button type="submit" class="btn btn-success">Finalizar compra</button>
+        </form>
     </div>
 </div>
+
+<script type="text/js" src="../public/js/deleteProduct.js"></script>

@@ -3,7 +3,8 @@ const Users = require('../models/users.models')
 
 
 class UsersDao {
-    async createUser(newUserInfo) {
+    async create(newUserInfo) {
+        console.log(newUserInfo)
         return await Users.create(newUserInfo)
     }
 

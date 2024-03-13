@@ -7,6 +7,23 @@ const CartsManagerMongo = require('../dao/cartsManagerMongo')
 const cartsManager = new CartsManager('carts.json');
 const cartsManagerMongo = new CartsManagerMongo()
 
+router.get('/:cid/purchase',  (req,res) => {
+    res.render('carts.handlebars')
+})
+
+router.post('/:cid/purchase', async (req, res) => {
+    try {
+        console.log(req.body)
+        
+        const cartId = req.params.cid;
+        const purchaseResult = await cartsManagerMongo.purchaseCart(cartId,req.user)
+        console.log(purchaseResult)
+        res.render('ticket.handlebars',{purchaseResult})
+    } catch (error) {
+        res.status(500).json({error: 'Error del servidor'})
+    }
+}) 
+
 router.post('/', async (req, res) => {
     try {
         const newCart = await cartsManagerMongo.createCart();
@@ -26,7 +43,7 @@ router.post('/', async (req, res) => {
         //res.status(500).json({ error: 'Error al crear el carrito' });
     //}
 //});
-
+ 
 router.get('/', async (req, res) => {
     try {
         const carts = await cartsModel.find();
@@ -57,7 +74,7 @@ router.get('/:cid', async (req, res) => {
                 strictPopulate: false
             }
         });  
-
+  
         let total = 0;
 
         cart.products.forEach(product => {
@@ -84,17 +101,19 @@ router.get('/:cid', async (req, res) => {
 //});
 
 router.post('/:cid/product/:pid', async (req, res) => {
-    try {
+    try { 
         const { cid, pid } = req.params;
         const { quantity} = req.body;
-        const cart = await cartsManagerMongo.addProductToCart(cid, pid, quantity);
+        const {stock} = req.body
+        console.log(stock)
+        const cart = await cartsManagerMongo.addProductToCart(cid, pid, quantity, stock);
         const updatedCart = await cartsModel.findById(cid);
-
+        
         if (!updatedCart) {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }
         await updatedCart.save()
-        res.json(cart);
+        res.redirect('/api/carts/65a75ab0e3dbdea179698fa7')
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al agregar producto al carrito' });

@@ -11,8 +11,16 @@ const cartsShema = new mongoose.Schema({
                 productId: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: 'products' // Referencia al modelo de productos
-                }, 
-                    quantity: Number }]
+                },   
+                    quantity: Number, 
+                    stock: Number,              
+                }],
+                users: [{   
+                    email: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'user' // Referencia al modelo de productos
+                    },               
+                    }]
      })      
 
 const cartsModel = mongoose.model(cartsCollection, cartsShema)

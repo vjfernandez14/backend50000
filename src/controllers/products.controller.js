@@ -10,6 +10,7 @@ const productsMangerMongo = require('../dao/productsMangerMongo')
 const ProductManager = require('../../ProductManager');
 const productsModel = require('../models/products.model');
 const messagesModel = require('../models/messages.model');
+const { isAdmin } = require('../middlewares/auth.middleware')
 
 
 
@@ -107,22 +108,7 @@ router.get('/', async (req, res) => {
     //}
 //})
 
-router.get('/:pid', async (req, res) => {
-    try {
-        const { pid } = req.params;
-
-        const product = await productManagerMongo.getProductById(pid);
-
-        if (product) {
-            return res.json(product);
-        } else {
-            res.status(404).json({ error: 'Producto no encontrado' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener el producto' });
-    }
-});
+ 
 
 
 
@@ -145,7 +131,11 @@ router.get('/:pid', async (req, res) => {
     //}
 //})
 
-router.post('/', async (req, res) => {
+router.get('/updateProducts', isAdmin, (req, res) => {
+    res.render('admin.handlebars')
+})
+
+router.post('/updateProducts',   async (req, res) => {
     try {
         const { title, description, price, thumbnail, stock, code, status = true, category } = req.body;
 
@@ -267,7 +257,7 @@ router.get('/home/home', async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Error al obtener los productos para la vista home' });
     }
-});
+});  
 
 router.get('/home/realtimeproducts', async (req, res) => {
     try {

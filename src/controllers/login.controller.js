@@ -6,6 +6,7 @@ const { useValidPassword } = require('../utils/crypt-password.util')
 const passport = require('passport')
 const { generateToken } = require('../utils/token.util')
 const { authToken } = require('../utils/token.util')
+const { isAdmin } = require('../middlewares/auth.middleware')
 
 
 
@@ -20,11 +21,12 @@ router.get('/', (req, res) => {
     }
 });
 
-router.get('/current', passport.authenticate('current', { session: false }), (req, res) => {
+router.get('/current',  passport.authenticate('current', { session: false }), isAdmin,  (req, res) => {
     // La autenticación ha sido exitosa y req.user contiene la información del usuario
     //res.json({ user: req.user });
     user = req.user
-    res.render('profile.handlebars', { user })
+    console.log(user.role)
+    res.render('admin.handlebars', { user })
 });
 
 router.post('/', passport.authenticate('login', {failureRedirect: '/api/users/login/fail-login'}), async (req,res) => {

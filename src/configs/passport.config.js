@@ -9,6 +9,8 @@ const cookieExtractor = require('../utils/cookie-extractor.util')
 const { generateToken } = require('../utils/token.util')
 const initializePassportJwt = require('./passport-jwt.config')
 const UsersDao = require('../dao/Users.dao')
+const { createUser, getUsers } = require('../services/users.service');
+const UserDtoCurrent = require('../DTO/current.dto')
 
 
 const LocalStrategy = local.Strategy
@@ -20,13 +22,21 @@ passport.use('current', new JWTStrategy({
     jwtFromRequest: jwt.ExtractJwt.fromExtractors([cookieExtractor]),
     secretOrKey: 'MiCodigo',
 },
-async (jwt_payload, done) => {
+async (jwt_payload, done) => {  
     try {
-        const user = await Users.findById(jwt_payload.user.id);
-        console.log(user)
-        console.log(jwt_payload)
+        usersDao = new UsersDao();
+        const user = await usersDao.find({ _id:jwt_payload.user.id});
+        
         if (user) {
-            return done(null, user);
+
+            const UserDto = new UserDtoCurrent({
+                first_name: user.first_name,
+                last_name: user.last_name,
+                email: user.email,
+                role: user.role,
+            })
+            console.log(UserDto)
+            return done(null, UserDto);
         } else {
             return done(null, false, { message: 'Usuario no encontrado' });
         }
@@ -43,22 +53,17 @@ const initializePassport = () => {
         {passReqToCallback: true, usernameField: 'email'},
         async (req, username, password, done) => {
         try {
-            const {first_name, last_name, email} = req.body
+            const {first_name, last_name, email, password} = req.body
             const user = await usersDao.find({email: email})
             if(user){   
                 console.log('User exists')
                 return done(null, false)
             }
-
-            const newUserInfo = {
-                first_name,
-                last_name,
-                email,
-                password: createHash(password),    
-            }
-
-            const newUser = await usersDao.createUser(newUserInfo)
-            return done(null, newUser)
+            
+            const newUserInfo = await createUser(req.body)
+            
+            
+            return done(null, newUserInfo)
                 
             } catch (error) {
                 console.log(error)
@@ -72,16 +77,15 @@ const initializePassport = () => {
 passport.use('login', new LocalStrategy(
     {usernameField: 'email'},
      async ( username, password, done) => {
-        usersDao = new UsersDao
+        //usersDao = new UsersDao
         try {
-            const user = await usersDao.find({email: username})
+            const user = await getUsers({email: username})
             console.log(user)
 
         if(!user) {
             console.log('Usuario no existe')
             return done(null,false)
-        }
-
+        } 
         if(!useValidPassword(user,password)) {
             console.log('contraseña incorrecta')
             return done(null,false)
@@ -135,8 +139,9 @@ passport.serializeUser((user, done) => {
   })
 
   passport.deserializeUser(async (id, done) => {
-    const user = Users.findById(id)
-    done(null, user)
+    userDao = new UsersDao
+    const user = userDao.find(id)
+    done(null, user) 
   })
 
 module.exports = initializePassport

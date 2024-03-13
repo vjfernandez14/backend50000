@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const CartModel = require('../models/carts.model');
 const cartsModel = require('../models/carts.model');
 const productsModel = require('../models/products.model');
+const Ticket = require('../models/ticket.model');
+const generateTicket = require('../services/ticket.service');
 
 
 class CartsManager {
@@ -28,10 +30,10 @@ class CartsManager {
         }
     }
 
-    async addProductToCart(cartId, productId, quantity) {
-        try {
+    async addProductToCart(cartId, productId, quantity,stock) {
+        try { 
             let cart = await this.getCartById(cartId);
-
+            
             if (!cart) {
                 cart = await this.createCart();
             }
@@ -44,10 +46,10 @@ class CartsManager {
                 cart.products[existingProductIndex].quantity += quantity;
             } else {
                 
-                const productToAdd = { productId, quantity };
-                
-                 cart.products.push(productToAdd);
-                 
+                const productToAdd = { productId, quantity, stock};
+                console.log(cart)
+                 const newCartt = cart.products.push(productToAdd);
+                 console.log(newCartt)
             }
 
             await CartModel.findOneAndUpdate({ _id: cartId }, cart);
@@ -139,6 +141,62 @@ class CartsManager {
             return { success: true };
         } catch (error) {
             throw new Error('Error al actualizar carrito');
+        }
+    }
+ 
+    async purchaseCart (cartId,user) {
+        try {
+        
+            const cart = await CartModel.findById(cartId).populate('products.productId')
+            console.log(cart.products)
+            if(!cart){
+                throw new Error('Carrito no encontrado')
+            }
+ 
+            const productsNotPurchase = []
+
+            cart.products.forEach( (item) =>{
+                //console.log(item)
+                const product = item.productId
+                //console.log(product)
+                const quantityInCart = item.quantity
+                const stock = product.stock
+                console.log(quantityInCart)
+                
+                if(stock < quantityInCart){
+                    productsNotPurchase.push(product._id.toString())
+                }
+            }) 
+
+            
+            await Promise.all(cart.products.map(async (item) => {
+                const product = item.productId
+                const quantityInCart = item.quantity
+                const stock = product.stock
+                console.log(product._id.toString())
+                console.log(productsNotPurchase)
+                if(!productsNotPurchase.includes(product._id.toString())){
+                    console.log(stock)
+                    const newStock = stock - quantityInCart
+                    console.log(product)
+                    console.log(newStock)
+                    await product.save()
+                    
+                }
+            })) 
+            
+            console.log('ooo')
+            const tick = await generateTicket(cart,user)
+            console.log(tick)
+            cart.purchased = true
+            
+            await cart.save()
+
+            return  tick
+
+
+        } catch (error) {
+            throw new Error('Error en compra')
         }
     }
 }
