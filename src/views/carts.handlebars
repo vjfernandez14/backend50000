@@ -11,9 +11,8 @@
                     <hr>
             
                     
-                    <form id="delete-form-{{this._id}}" data-product-id="{{this.productId._id}}">
-                        <button type="button" class="btn btn-danger delete-button">Eliminar</button>
-                     </form>
+                    <button onclick="eliminarProducto('{{../cart._id}}', '{{this.productId._id}}')" class="btn btn-danger">Eliminar</button>
+
                 </div>
             </div>
         </div>
@@ -27,4 +26,4 @@
     </div>
 </div>
 
-<script type="text/js" src="../public/js/deleteProduct.js"></script>
+<script type="text/javascript" src="/js/deleteProduct.js"></script>

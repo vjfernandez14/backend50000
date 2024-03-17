@@ -22,6 +22,6 @@ class UsersFactory {
         }
     }
 
-}
+} 
 
 module.exports = UsersFactory

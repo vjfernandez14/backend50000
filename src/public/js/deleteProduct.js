@@ -1,18 +1,20 @@
-
-document.addEventListener('DOMContentLoaded', function() {
-    const deleteButtons = document.querySelectorAll('.delete-button');
-
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', async function() {
-            const productId = this.closest('form').getAttribute('data-product-id');
-            const response = await fetch(`/api/carts/{{cart._id}}/product/${productId}`, {
-                method: 'DELETE'
-            });
-            if (response.ok) {
-                // Actualizar la interfaz de usuario si es necesario
-            } else {
-                console.error('Error al eliminar el producto del carrito');
-            }
-        });
-    }); 
-});
+function eliminarProducto(cartId, productId) {
+    console.log(cartId)
+    fetch(`/api/carts/${cartId}/product/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.reload(); // Recarga la página para reflejar los cambios en el carrito
+      } else {
+        console.error('Error al eliminar el producto del carrito');
+      }
+    })
+    .catch(error => {
+      console.error('Error de red:', error);
+    });
+  }
+  

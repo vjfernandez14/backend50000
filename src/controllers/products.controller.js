@@ -262,8 +262,8 @@ router.get('/home/home', async (req, res) => {
 router.get('/home/realtimeproducts', async (req, res) => {
     try {
         const products = await productManagerMongo.getProducts();
-        console.log(products)
-        res.render('realTimeProducts.handlebars', { products });
+        console.log(user)
+        res.render('realTimeProducts.handlebars', { products },{user});
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al obtener los productos para la vista home' });

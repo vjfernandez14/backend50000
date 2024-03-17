@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const CartsManager = require('../../CartsManager');
 const cartsModel = require('../models/carts.model')
-const CartsManagerMongo = require('../dao/cartsManagerMongo')
+const CartsManagerMongo = require('../dao/cartsManagerMongo');
+const ProductMangerMongo = require('../dao/productsMangerMongo');
+const transport = require('../utils/nodemailer');
+const { email } = require('../configs/client');
 
 const cartsManager = new CartsManager('carts.json');
 const cartsManagerMongo = new CartsManagerMongo()
@@ -13,11 +16,28 @@ router.get('/:cid/purchase',  (req,res) => {
 
 router.post('/:cid/purchase', async (req, res) => {
     try {
-        console.log(req.body)
-        
         const cartId = req.params.cid;
+        const myCart = await cartsManagerMongo.getCartById(cartId)
+        console.log(myCart)
+        for (let i = 0; i < myCart.products.length; i++) {
+            const product = myCart.products[i];
+            const productManager = new ProductMangerMongo
+            const newproduct = await productManager.updateProductStock(product.productId,product.stock,product.quantity)
+                break; 
+            }
+
         const purchaseResult = await cartsManagerMongo.purchaseCart(cartId,req.user)
-        console.log(purchaseResult)
+        await transport.sendMail({
+            from: email.identifier,
+            to: email.identifier,
+            subject: 'Gracias por tu compra',
+            html:`
+            <h1>Compra realizada con exito</h1>
+            <p>tu numero de comprobante es: ${purchaseResult.code}</p>
+            <h2>TOTAL: ${purchaseResult.amount}</h2>
+            `
+        })
+        await cartsManagerMongo.removeAllProductsFromCart(cartId)
         res.render('ticket.handlebars',{purchaseResult})
     } catch (error) {
         res.status(500).json({error: 'Error del servidor'})
@@ -113,7 +133,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
             return res.status(404).json({ error: 'Carrito no encontrado' });
         }
         await updatedCart.save()
-        res.redirect('/api/carts/65a75ab0e3dbdea179698fa7')
+        res.redirect(`/api/carts/${cid}`);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al agregar producto al carrito' });
@@ -142,7 +162,7 @@ router.put('/:cid/product/:pid', async (req,res) => {
 router.delete('/:cid/product/:pid', async (req,res) => {
     try{
         const { cid, pid } = req.params
-
+        console.log(cid)
         const updateCart = await cartsManagerMongo.removeProductCart(cid,pid)
         res.json(updateCart)
 

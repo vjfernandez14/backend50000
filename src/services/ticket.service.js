@@ -2,7 +2,7 @@
 const Ticket = require('../models/ticket.model');
 
 const generateTicket = async (cart,user) => {
-  try {
+  try {  
     
     const purchaseDateTime = new Date();
     const amount = calculateTotalAmount(cart.products);

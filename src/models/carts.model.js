@@ -13,7 +13,7 @@ const cartsShema = new mongoose.Schema({
                     ref: 'products' // Referencia al modelo de productos
                 },   
                     quantity: Number, 
-                    stock: Number,              
+                    stock: Number,                 
                 }],
                 users: [{   
                     email: {

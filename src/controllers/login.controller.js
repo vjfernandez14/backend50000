@@ -36,6 +36,7 @@ router.post('/', passport.authenticate('login', {failureRedirect: '/api/users/lo
             last_name: req.user.last_name,
             email: req.user.email,
             role: req.user.role,
+            cartId: req.user.cartId,
         }
 
        //res.redirect('/api/products')

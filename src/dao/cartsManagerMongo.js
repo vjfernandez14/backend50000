@@ -38,20 +38,25 @@ class CartsManager {
                 cart = await this.createCart();
             }
             
-            
-            const existingProductIndex = cart.products.findIndex(product => product.productId === productId);
-            
-            if (existingProductIndex !== -1) {
-                
-                cart.products[existingProductIndex].quantity += quantity;
-            } else {
-                
-                const productToAdd = { productId, quantity, stock};
-                console.log(cart)
-                 const newCartt = cart.products.push(productToAdd);
-                 console.log(newCartt)
-            }
+            let productFound = false;
 
+    
+        for (let i = 0; i < cart.products.length; i++) {
+            const product = cart.products[i];
+            
+            if (product.productId.toString() === productId) {
+                product.quantity = parseInt(product.quantity) + parseInt(quantity)
+                productFound = true;
+                break; 
+            }
+        }
+
+        
+        if (!productFound) {
+            cart.products.push({ productId, quantity, stock });
+        }
+
+          
             await CartModel.findOneAndUpdate({ _id: cartId }, cart);
 
             
@@ -63,21 +68,40 @@ class CartsManager {
 
     async removeProductCart(cartId, productId) {
         try {
-            const cart = await cartsModel.findById(cartId)
-            console.log(cart.products)
-            cart.products = cart.products.filter(product => {
-                console.log("product._id:", product.productId, "productId:", productId);
-                return product.productId.toString() !== productId.toString();
-            });
-            
-            const updateCart = await cart.save()
-            console.log(updateCart)
-            return updateCart
+            // Buscar el carrito por su ID
+            console.log('remove')
+            console.log(productId)
+            const cart = await cartsModel.findById(cartId);
+            console.log(cart.products[0].productId.toString)
 
+            const updatedProducts = []
+
+            for (let i = 0; i < cart.products.length; i++) {
+                // Obtener el producto actual
+                const product = cart.products[i].productId;
+    
+                // Verificar si el productId del producto actual coincide con el productId que se desea eliminar
+                if (product.toString() !== productId) {
+                    // Si no coincide, agregar el producto al arreglo de productos filtrados
+                    updatedProducts.push(product);
+                    console.log(updatedProducts)
+                }
+            }
+            // Filtrar los productos del carrito para eliminar el producto con el ID dado
+            cart.products = cart.products.filter(product => product.productId.toString() !== productId.toString());
+
+            
+            // Guardar los cambios en el carrito
+            //console.log(cart)
+            const updateCart = await cart.save();   
+    
+            // Devolver el carrito actualizado
+            return updateCart;
         } catch (error) {
-            throw(error)
+            throw(error);
         }
     }
+    
 
     async updateProductQuantity(cartId, productId, quantity) {
         try {
@@ -114,7 +138,7 @@ class CartsManager {
 
             
             cart.products = [];
-
+            console.log('llego')
             
             await cart.save();
 

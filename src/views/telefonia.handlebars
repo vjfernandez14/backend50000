@@ -30,7 +30,7 @@
                 <p class="card-text">Descripción: {{this.description}}</p>
                 <p class="card-text">Stock: {{this.stock}}</p>
                 
-                <form action="/api/carts/65a75ab0e3dbdea179698fa7/product/{{this._id}}" method="POST">
+                <form action="/api/carts/{{../user.cartId}}/product/{{this._id}}" method="POST">
                     <div class="form-group">
                         <label for="quantity">Cantidad:</label>
                         <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="{{this.stock}}">

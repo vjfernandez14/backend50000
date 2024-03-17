@@ -90,6 +90,28 @@ class ProductMangerMongo {
         }
     }
 
+    async updateProductStock(productId, stock, quantity) {
+        try {
+            // Actualizar el stock del producto en la base de datos
+            const result = await productsModel.updateOne(
+                { _id: productId }, // Filtro para encontrar el producto por su ID
+                { $set: { stock: stock - quantity } } // Actualización del campo stock
+            );
+    
+            // Verificar si la actualización fue exitosa
+            if (result.modifiedCount === 0) {
+                throw new Error(`No se pudo actualizar el stock del producto con ID ${productId}`);
+            }
+    
+            // Retornar el producto actualizado (opcional)
+            return { _id: productId, stock: stock - quantity };
+        } catch (error) {
+            throw new Error(`Error al actualizar stock: ${error.message}`);
+        }
+    }
+    
+    
+
     async deleteProduct(id) {
         try {
             // Eliminar un producto por su ID de la base de datos
