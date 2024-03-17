@@ -10,13 +10,13 @@ class ProductMangerMongo {
                 throw new Error('Todos los campos son obligatorios');
             }
 
-            // Verificar si ya existe un producto con el mismo código
+            
             const existingProduct = await productsModel.findOne({ code: code });
             if (existingProduct) {
                 throw new Error('Ya existe un producto con el mismo código');
             }
 
-            // Crear un nuevo documento basado en el modelo
+           
             const newProduct = new productsModel({
                 title,
                 description,
@@ -28,10 +28,10 @@ class ProductMangerMongo {
                 thumbnail
             });
 
-            // Guardar el nuevo producto en la base de datos
+            
             await newProduct.save();
 
-            return newProduct.toObject(); // Devolver el objeto del producto creado
+            return newProduct.toObject(); 
         } catch (error) {
             throw new Error(`Error al agregar producto: ${error.message}`);
         }
@@ -39,9 +39,9 @@ class ProductMangerMongo {
 
     async getProducts() {
         try {
-            // Obtener todos los productos de la base de datos
+            
             const products = await productsModel.find();
-            return products.map(product => product.toObject()); // Devolver los objetos de productos
+            return products.map(product => product.toObject()); 
         } catch (error) {
             throw new Error(`Error al obtener productos: ${error.message}`);
         }
@@ -49,14 +49,14 @@ class ProductMangerMongo {
 
     async getProductById(id) {
         try {
-            // Buscar un producto por su ID en la base de datos
+            
             const product = await productsModel.findById(id);
             
             if (!product) {
                 throw new Error('Producto no encontrado');
             }
 
-            return product.toObject(); // Devolver el objeto del producto encontrado
+            return product.toObject(); 
         } catch (error) {
             throw new Error(`Error al obtener producto por ID: ${error.message}`);
         }
@@ -64,14 +64,14 @@ class ProductMangerMongo {
 
     async updateProduct(id, title, description, price, code, stock, status, category, thumbnail) {
         try {
-            // Buscar un producto por su ID en la base de datos
+            
             const product = await productsModel.findById(id);
 
             if (!product) {
                 throw new Error('Producto no encontrado');
             }
 
-            // Actualizar los campos del producto
+            
             product.title = title || product.title;
             product.description = description || product.description;
             product.price = price || product.price;
@@ -92,18 +92,18 @@ class ProductMangerMongo {
 
     async updateProductStock(productId, stock, quantity) {
         try {
-            // Actualizar el stock del producto en la base de datos
+            
             const result = await productsModel.updateOne(
-                { _id: productId }, // Filtro para encontrar el producto por su ID
-                { $set: { stock: stock - quantity } } // Actualización del campo stock
+                { _id: productId }, 
+                { $set: { stock: stock - quantity } } 
             );
     
-            // Verificar si la actualización fue exitosa
+            
             if (result.modifiedCount === 0) {
                 throw new Error(`No se pudo actualizar el stock del producto con ID ${productId}`);
             }
     
-            // Retornar el producto actualizado (opcional)
+            
             return { _id: productId, stock: stock - quantity };
         } catch (error) {
             throw new Error(`Error al actualizar stock: ${error.message}`);
@@ -114,14 +114,14 @@ class ProductMangerMongo {
 
     async deleteProduct(id) {
         try {
-            // Eliminar un producto por su ID de la base de datos
+            
             const product = await productsModel.findByIdAndDelete(id);
 
             if (!product) {
                 throw new Error('Producto no encontrado');
             }
 
-            return product.toObject(); // Devolver el objeto del producto eliminado
+            return product.toObject(); 
         } catch (error) {
             throw new Error(`Error al eliminar producto: ${error.message}`);
         }

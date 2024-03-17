@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
     try {
         const { limit = 10, page = 1, sort, query } = req.query;
 
-        // Construir el objeto de opciones para la consulta paginada
+        
         const options = {
             page: parseInt(page),
             limit: parseInt(limit),
@@ -30,16 +30,16 @@ router.get('/', async (req, res) => {
         };
         console.log(options)
 
-        // Construir el objeto de filtro para la consulta
+       
         const filter = query ? { category: query } : {}; // Esto es un ejemplo, ajusta según tus necesidades
 
-        // Realizar la consulta paginada
+       
         const { docs, hasPrevPage, hasNextPage, nextPage, prevPage, totalPages } = await productsModel.paginate(filter, options);
         telefonia = docs
         console.log(docs)
 
         if (!req.session.user) {
-            return res.redirect('/'); // O redirige a la página de inicio de sesión si no está autenticado
+            return res.redirect('/'); 
         }
         
     

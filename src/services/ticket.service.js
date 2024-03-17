@@ -46,7 +46,7 @@ const calculateTotalAmount = (products) => {
 
 
 const generateUniqueCode = () => {
-    // Generar un código aleatorio utilizando caracteres alfanuméricos
+    
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let code = '';
     for (let i = 0; i < 10; i++) {
