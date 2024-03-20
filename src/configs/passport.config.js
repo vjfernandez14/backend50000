@@ -11,6 +11,9 @@ const initializePassportJwt = require('./passport-jwt.config')
 const UsersDao = require('../dao/Users.dao')
 const { createUser, getUsers } = require('../services/users.service');
 const UserDtoCurrent = require('../DTO/current.dto')
+const CartsManager = require('../dao/cartsManagerMongo')
+const CustomError = require('../handlers/errors/custom-errors')
+const dictonaryErrors = require('../handlers/errors/enum-errors')
 
 
 const LocalStrategy = local.Strategy
@@ -57,6 +60,7 @@ const initializePassport = () => {
             const user = await usersDao.find({email: email})
             if(user){   
                 console.log('User exists')
+                throw CustomError.createError({ name: 'Error', message: 'Usuario ya existente', code: dictonaryErrors.USER_ALREADY_EXISTS });
                 return done(null, false)
             }
             
@@ -81,14 +85,19 @@ passport.use('login', new LocalStrategy(
         try {
             const user = await getUsers({email: username})
             console.log(user)
+            
+            
 
         if(!user) {
             console.log('Usuario no existe')
-            return done(null,false)
+            throw CustomError.createError({ name: 'Error', message: 'Usuario no encontrado', code: dictonaryErrors.NOT_FOUND })
+            
+            
         } 
         if(!useValidPassword(user,password)) {
             console.log('contraseña incorrecta')
-            return done(null,false)
+            throw CustomError.createError({ name: 'Error', cause: 'La contraseña proporcionada es incorrecta.', message: 'Contraseña incorrecta', code: dictonaryErrors.INVALID_PASSWORD })
+            
         }
         
         
@@ -99,7 +108,8 @@ passport.use('login', new LocalStrategy(
 
         return done(null,user)
         } catch (error) {
-            done(error)
+            console.log(error)
+            return done(error)
         }
      }))
 

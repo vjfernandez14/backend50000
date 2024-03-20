@@ -6,6 +6,8 @@ const CartsManagerMongo = require('../dao/cartsManagerMongo');
 const ProductMangerMongo = require('../dao/productsMangerMongo');
 const transport = require('../utils/nodemailer');
 const { email } = require('../configs/client');
+const CustomError = require('../handlers/errors/custom-errors');
+const dictonaryErrors = require('../handlers/errors/enum-errors');
 
 const cartsManager = new CartsManager('carts.json');
 const cartsManagerMongo = new CartsManagerMongo()
@@ -18,7 +20,13 @@ router.post('/:cid/purchase', async (req, res) => {
     try {
         const cartId = req.params.cid;
         const myCart = await cartsManagerMongo.getCartById(cartId)
-        console.log(myCart)
+        if (!myCart) {
+            throw CustomError.createError({ 
+                name: 'Error', 
+                message: 'Carrito no encontrado', 
+                code: dictonaryErrors.NOT_FOUND 
+            });
+        }
         for (let i = 0; i < myCart.products.length; i++) {
             const product = myCart.products[i];
             const productManager = new ProductMangerMongo
@@ -40,7 +48,7 @@ router.post('/:cid/purchase', async (req, res) => {
         await cartsManagerMongo.removeAllProductsFromCart(cartId)
         res.render('ticket.handlebars',{purchaseResult})
     } catch (error) {
-        res.status(500).json({error: 'Error del servidor'})
+        res.status(error.code || 500).json({ error: error.message })
     }
 }) 
 

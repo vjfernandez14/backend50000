@@ -11,6 +11,7 @@ const ProductManager = require('../../ProductManager');
 const productsModel = require('../models/products.model');
 const messagesModel = require('../models/messages.model');
 const { isAdmin } = require('../middlewares/auth.middleware')
+const { generateProducts } = require('../utils/product-mock.util')
 
 
 
@@ -77,6 +78,15 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/mockingproducts', async (req,res) => {
+    try {
+        const products = generateProducts(100)
+        res.render('telefonia.handlebars',{telefonia:products})
+
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 //router.get('/', async (req, res) => {
     //try{
