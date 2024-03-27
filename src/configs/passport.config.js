@@ -14,6 +14,9 @@ const UserDtoCurrent = require('../DTO/current.dto')
 const CartsManager = require('../dao/cartsManagerMongo')
 const CustomError = require('../handlers/errors/custom-errors')
 const dictonaryErrors = require('../handlers/errors/enum-errors')
+const logger = require('../factory/logger.factory')
+
+const winstonLogger = logger
 
 
 const LocalStrategy = local.Strategy
@@ -59,7 +62,7 @@ const initializePassport = () => {
             const {first_name, last_name, email, password} = req.body
             const user = await usersDao.find({email: email})
             if(user){   
-                console.log('User exists')
+                winstonLogger.info('User exist')
                 throw CustomError.createError({ name: 'Error', message: 'Usuario ya existente', code: dictonaryErrors.USER_ALREADY_EXISTS });
                 return done(null, false)
             }
@@ -84,18 +87,16 @@ passport.use('login', new LocalStrategy(
         //usersDao = new UsersDao
         try {
             const user = await getUsers({email: username})
-            console.log(user)
-            
             
 
         if(!user) {
-            console.log('Usuario no existe')
+            winstonLogger.warning('Usuario no existe')
             throw CustomError.createError({ name: 'Error', message: 'Usuario no encontrado', code: dictonaryErrors.NOT_FOUND })
             
             
         } 
         if(!useValidPassword(user,password)) {
-            console.log('contraseña incorrecta')
+            winstonLogger.error('contraseña incorrecta')
             throw CustomError.createError({ name: 'Error', cause: 'La contraseña proporcionada es incorrecta.', message: 'Contraseña incorrecta', code: dictonaryErrors.INVALID_PASSWORD })
             
         }
@@ -108,7 +109,7 @@ passport.use('login', new LocalStrategy(
 
         return done(null,user)
         } catch (error) {
-            console.log(error)
+            winstonLogger.error(error)
             return done(error)
         }
      }))
@@ -119,7 +120,7 @@ passport.use('login', new LocalStrategy(
         callbackURL: 'http://localhost:8080/api/users/login/githubcallback',
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            console.log(profile)
+            
             usersDao = new UsersDao
             const { id, login, name, email } = profile._json
     
@@ -138,13 +139,13 @@ passport.use('login', new LocalStrategy(
     
             return done(null, user)
         } catch (error) {
-            console.log(error)
+            winstonLogger.error(error)
             done(error)
         }
     }));
 
 passport.serializeUser((user, done) => {
-    console.log(user)
+    winstonLogger.error(error)
     done(null, user._id)
   })
 

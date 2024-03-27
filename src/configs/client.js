@@ -9,4 +9,5 @@ module.exports = {
         identifier: process.env.EMAIL_IDENTIFIER,
         password: process.env.EMAIL_PASSWORD,
       },
+    enviromentLogger: process.env.ENVIRONMENT_LOGGER,
 }
