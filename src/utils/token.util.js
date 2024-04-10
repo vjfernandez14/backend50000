@@ -20,10 +20,18 @@ const authToken = (req,res, next) => {
     req.user = credentials.user
 
     next()
-    })
+    })     
 }
+
+const generateResetToken = user => {
+    const userId = user._id.toString()
+    console.log(userId)
+    const resetToken = jwt.sign({userId: user._id.toString()}, PRIVATE_KEY, {expiresIn: '1h'})
+    return resetToken
+}   
 
 module.exports = {
     generateToken,
     authToken,
+    generateResetToken,
 }

@@ -1,9 +1,9 @@
 
     const isAdmin = (req, res, next) => {
         console.log(req.user)
-        if(req.user && req.user.role === 'admin') {
+        if(req.user && req.user.role === 'admin' || req.user.role === 'premium' ) {
             return next()
-        } else {
+        } else {    
             return res.status(403).json({ message: 'Accesso no autorizado, solo admin'})
         }
     }

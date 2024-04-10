@@ -12,4 +12,4 @@ const useValidPassword = (user,password) => {
 module.exports = {
     createHash,
     useValidPassword,
-}
+} 

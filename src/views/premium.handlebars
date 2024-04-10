@@ -40,8 +40,10 @@
                     <input type="hidden" name="stock" value="{{this.stock}}">
                     <button type="submit" class="btn btn-primary">Agregar al carrito</button>
  
+                        <button class="btn btn-danger" data-product-id="{{this._id}}" onclick="deleteProduct(this)">Eliminar</button>
+
+
                 </form>
-                <button class="btn btn-danger" data-product-id="{{this._id}}" onclick="deleteProductBD({{this._id}})">Eliminar</button>
             </div>
         </div>
     </div>

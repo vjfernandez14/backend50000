@@ -50,7 +50,7 @@ async (jwt_payload, done) => {
         return done(error);
     }
 }
-));
+));  
 
 
 const initializePassport = () => {
@@ -65,9 +65,9 @@ const initializePassport = () => {
                 winstonLogger.info('User exist')
                 throw CustomError.createError({ name: 'Error', message: 'Usuario ya existente', code: dictonaryErrors.USER_ALREADY_EXISTS });
                 return done(null, false)
-            }
+            } 
             
-            const newUserInfo = await createUser(req.body)
+            const newUserInfo = await createUser(req.body) 
             
             
             return done(null, newUserInfo)
@@ -145,7 +145,7 @@ passport.use('login', new LocalStrategy(
     }));
 
 passport.serializeUser((user, done) => {
-    winstonLogger.error(error)
+    winstonLogger.error('Esto es un error')
     done(null, user._id)
   })
 

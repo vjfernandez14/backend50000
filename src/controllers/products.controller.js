@@ -44,6 +44,7 @@ router.get('/', async (req, res) => {
         }
         
     
+    
         const userData = req.session.user;
     
 
@@ -55,7 +56,7 @@ router.get('/', async (req, res) => {
             prevPage,
             query,
             limit,
-            user: userData,
+            user: userData,    
         });
         
         const response = {
@@ -218,14 +219,17 @@ router.post('/updateProducts',   async (req, res) => {
 
 router.delete('/:pid', async (req, res) => {
     const { pid } = req.params;
-
+    const userRole = req.session.user.role;
     try {
-        const productDelete = await productManagerMongo.deleteProduct(pid);
-        if (productDelete) {
-            res.json({ message: 'Producto eliminado', product: productDelete });
-        } else {
-            res.status(404).json({ message: 'Producto no encontrado' });
-        }
+        if(userRole === 'admin' || (userRole === 'premium' && product.owner === req.user._id)) { 
+            
+            const productDelete = await productManagerMongo.deleteProduct(pid);
+            if (productDelete) {
+                res.json({ message: 'Producto eliminado', product: productDelete });
+            } else {
+                res.status(404).json({ message: 'Producto no encontrado' });
+            }
+        } 
     } catch (error) {
         console.error(error.message);
         if (error.message === 'No se encontró el producto') {
@@ -292,7 +296,7 @@ router.post('/home/realtimeproducts', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+}); 
 
 
 

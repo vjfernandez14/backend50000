@@ -21,6 +21,25 @@ class UsersDao {
     async delete(){
         return await Users.deleteOne({_id: userId})
     }
+
+    async update(userId, updatedFields) {
+        try {
+            
+            const user = await Users.findById(userId);
+
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            Object.assign(user, updatedFields);
+ 
+            await user.save();
+
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = UsersDao

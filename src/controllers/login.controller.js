@@ -2,13 +2,17 @@ const express = require('express')
 const router = express.Router()
 const handlebars = require('express-handlebars')
 const Users = require('../models/users.models')
-const { useValidPassword } = require('../utils/crypt-password.util')
+const { useValidPassword, createHash } = require('../utils/crypt-password.util')
 const passport = require('passport')
-const { generateToken } = require('../utils/token.util')
+const { generateToken, generateResetToken } = require('../utils/token.util')
 const { authToken } = require('../utils/token.util')
 const { isAdmin } = require('../middlewares/auth.middleware')
+const UsersDao = require('../dao/Users.dao')
+const transport = require('../utils/nodemailer');
+const jwt = require('jsonwebtoken')
+const { transports } = require('winston')
 
-
+const usersDao = new UsersDao
 
 
 router.get('/', (req, res) => {
@@ -21,12 +25,15 @@ router.get('/', (req, res) => {
     }
 });
 
-router.get('/current',  passport.authenticate('current', { session: false }), isAdmin,  (req, res) => {
-    // La autenticación ha sido exitosa y req.user contiene la información del usuario
-    //res.json({ user: req.user });
-    user = req.user
-    console.log(user.role)
-    res.render('admin.handlebars', { user })
+router.get('/current',  passport.authenticate('current', { session: false }), isAdmin, async (req, res) => {
+    try {
+        user = req.user
+        console.log(user.role)
+        res.render('admin.handlebars', { user })
+        
+    } catch (error) {
+        console.log(error)
+    }
 });
 
 router.post('/', passport.authenticate('login', {failureRedirect: '/api/users/login/fail-login'}), async (req,res) => {
@@ -65,8 +72,6 @@ router.get('/fail-login', (req,res) => {
 router.get('/logout', (req, res) => {
     console.log('logout');
 
-
-
     req.session.destroy(err => {
         if (err) {
             console.error('Error al destruir la sesión:', err);
@@ -89,6 +94,105 @@ router.get('/githubcallback', passport.authenticate('github', {failureRedirect: 
     res.redirect('/api/products')
 })
 
+router.get('/forgot', (req,res) => {
+    res.render('forgot.handlebars')
+})
 
+router.post('/forgot', async (req,res) => {
+    const userEmail = req.body.email
+
+    try {
+       const user = await  usersDao.find({email: userEmail})
+       console.log('hace el post')
+       console.log(user)
+       if(!user){
+        return res.status(404).json({error: 'Usuario no encontrador'})
+    }
+
+    const resetToken = generateResetToken(user._id)
+    console.log(resetToken)
+    const resetLink = `http://localhost:8080/api/users/login/forgot/${resetToken}`
+    console.log(userEmail)
+
+    await transport.sendMail({
+        from: 'victorjosefernandezviloria@gmail.com',
+        to: userEmail,
+        subject: 'Recuperacion de password',
+        html:`
+        <h1>Para recuperar tu contraseña</h1>
+        <p>Haga click:<a href="${resetLink}">aquí</a></p>
+        
+        `
+    })
+
+
+    } catch (error) {
+        console.log(error)  
+    }
+})
+
+router.get('/forgot/:token', async (req, res) => {
+    const token = req.params.token;
+    console.log(token)
+    try {
+        // Verificar el token JWT
+        const decodedToken = jwt.decode(token);
+        console.log('first')
+        console.log(decodedToken)
+        const userId = decodedToken.userId.toString();
+        console.log(userId)
+        const user = await usersDao.find({ _id: userId });
+        console.log(user)
+        
+        if (!user) {
+            // El token es válido pero el usuario no existe, redirigir a una vista de error
+            return res.redirect('/error');
+        }
+
+        res.render('reset.handlebars', { token });
+    } catch (error) {
+        // El token es inválido o ha expirado, redirigir a una vista de error
+        return res.redirect('/error');
+    }
+});
+
+
+router.post('/forgot/:token', async (req,res) => {
+    const token = req.params.token
+    const newPassword = req.body.password
+    const newPasswordCheck = req.body.confirmPassword
+    console.log('llega a la ruta')
+     
+
+    try {
+
+        if(newPassword !== newPasswordCheck){
+            return res.redirect('/api/users/login')
+        }
+        const descToken = jwt.verify(token,'MiCodigo')
+        const userId = descToken.userId.toString()
+        
+        const user = await usersDao.find({_id:userId})
+        if(!user){
+            return res.redirect('/forgot')
+        }
+        const compare = useValidPassword(user,newPassword)
+        console.log(compare)
+        if(compare) {
+            return res.redirect('/api/users/login/forgot');
+        }
+        const hashedPassword = createHash(newPassword)
+
+        user.password = hashedPassword;
+        await usersDao.update(userId, { password: hashedPassword });
+
+        res.redirect('/api/users/login');
+        
+
+    } catch (error) {
+        console.log(error)
+        return res.redirect('/api/users/login')
+    }
+})
 
 module.exports = router
