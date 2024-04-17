@@ -124,10 +124,10 @@ router.post('/forgot', async (req,res) => {
         
         `
     })
-
+    res.render('forgotVer.handlebars', { successMessage: 'Se envió un mail con un link para restablecer tu contraseña' })
 
     } catch (error) {
-        console.log(error)  
+        console.log(error)   
     }
 })
 

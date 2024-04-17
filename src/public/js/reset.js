@@ -11,7 +11,7 @@ form.addEventListener('submit', e => {
 
     data.forEach((value,key) => (obj[key] = value))
 
-    const fetchParams = { 
+    const fetchParams = {  
         url: `http://localhost:8080/api/users/login/forgot/${token}`,
         headers: {
             'content-type':'application/json',
@@ -29,4 +29,4 @@ form.addEventListener('submit', e => {
     .then(response => response.json())
     .then(data => console.log(data))
     .catch(error => console.log(error))
-})
+})  

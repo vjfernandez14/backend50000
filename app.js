@@ -11,7 +11,8 @@ const initializePassport = require('./src/configs/passport.config');
 const passport = require('passport');
 const initializePassportJwt = require('./src/configs/passport.config');
 const logger = require('./src/middlewares/logger.middleware');
- 
+const swaggerUIexpress = require('swagger-ui-express');
+const specs = require('./src/utils/swagger');
 
 
 
@@ -24,12 +25,12 @@ app.engine('handlebars', handlebars.engine({
     }
 }))
 app.set('views', process.cwd() + '/src/views')  
-
+app.use('/docs', swaggerUIexpress.serve, swaggerUIexpress.setup(specs))
 
 
 
 app.get('/products', (req, res) => {
-    res.render('home.handlebars')
+    res.render('home.handlebars') 
 })
 
 const httpServer = app.listen(port,()=>{

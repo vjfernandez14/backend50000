@@ -17,7 +17,7 @@ const productsShema = new mongoose.Schema({
     thumbnail: String,
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', 
+        ref: 'User',           
         default: 'admin',
         validate: {
             validator: async function (value) {

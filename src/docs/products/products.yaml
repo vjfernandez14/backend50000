@@ -1,0 +1,164 @@
+openapi: "3.0.3"
+info: 
+  title: 'Api products'
+  version: '1.0' 
+paths:
+  /api/products/:
+    get:
+      summary: Obtiene todos los productos
+      tags: 
+        - products
+      responses:
+        "200":
+          description: Se obtienen todos los productos y su vista correspondiente 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        "500":
+          description: Error interno del servidor
+  /api/products/mockingproducts:
+    get:
+      summary: Obtiene todos los productos generados con mocking
+      tags: 
+        - products
+      responses:
+        "200":
+          description: Se obtienen todos los productos y su vista correspondiente 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        "500":
+          description: Error interno del servidor
+  /api/products/{pid}:
+    put:
+      summary: Se actualiza un producto según su id
+      tags: 
+        - products
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: El ID del producto a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+            example:
+              title: "PS5 Slim"
+              description: "Nueva versión más compacta de la consola"
+              price: 1100
+              code: 46
+              status: true
+              category: "Tecnología"
+              thumbnail: "ps5Slim.jpg"
+      responses:
+        "200":
+          description: Se modifica un producto, pasando como parámetro el id correspondiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "500":
+          description: Error interno del servidor
+    delete:
+      summary: Elimina un producto según su ID
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+            description: ID del producto a eliminar
+      responses:
+        "200":
+          description: Producto eliminado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "403":
+          description: Acceso denegado. No tiene permisos para eliminar este producto.
+        "404":
+          description: Producto no encontrado
+        "500":
+          description: Error interno del servidor
+  /api/products/updateProducts:
+    post:
+      summary: Crea un nuevo producto
+      tags:
+        - products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        "201":
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: Error de validación. Faltan campos obligatorios.
+        "500":
+          description: Error interno del servidor
+components:
+  schemas: 
+    Product:
+      type: object
+      properties:
+        _id: 
+          type: ObjectId
+          description: Id automatico de Mongo
+        title: 
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Informacion del producto
+        price:
+          type: number
+          description: Valor final del producto
+        stock:
+          type: number
+          description: Cantidad disponible
+        code:
+          type: number
+          description: Codigo unico del producto
+        status:
+          type: boolean
+          description: Informa si el producto esta activo o no
+        category:
+          type: string
+          description: Rubro al que pertenece el producto
+        thumbnail:
+          type: string
+          description: Imagend de referencia del producto
+        owner:
+          type: objectId
+          description: Referencia al usuario que creo el producto
+      example:
+        _id: ObjectId("45fd4saf46g45g4w54gw34gw")
+        title: PS5
+        description: Consolo de videojuego de alta resolucion
+        stock: 50
+        price: 1200
+        code: 45
+        status: true
+        category: Tecnologia
+        thumbnail: ps5Imagen.jpg
+        owner: ObjectId("aada4545afa54fa5f4a54f")

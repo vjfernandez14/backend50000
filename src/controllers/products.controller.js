@@ -81,7 +81,7 @@ router.get('/', async (req, res) => {
 
 router.get('/mockingproducts', async (req,res) => {
     try {
-        const products = generateProducts(100)
+        const products = generateProducts(100) 
         res.render('telefonia.handlebars',{telefonia:products})
 
     } catch (error) {
@@ -143,7 +143,7 @@ router.get('/mockingproducts', async (req,res) => {
 //})
 
 router.get('/updateProducts', isAdmin, (req, res) => {
-    res.render('admin.handlebars')
+    res.render('admin.handlebars')    
 })
 
 router.post('/updateProducts',   async (req, res) => {
@@ -159,7 +159,7 @@ router.post('/updateProducts',   async (req, res) => {
         res.status(201).json({ message: 'Producto cargado', product: newProduct });
     } catch (error) {
         res.status(500).json({ error: error.message });
-    }
+    }    
 });
 //router.post('/', async (req,res) =>{
     //try {
@@ -177,7 +177,7 @@ router.post('/updateProducts',   async (req, res) => {
 
   router.put('/:pid', async (req, res) => {
     const { pid } = req.params;
-    const { title, description, price, thumbnail, stock, code, status = true, category } = req.body;
+    const { title, description, price, thumbnail, stock, code, status = true, category } = req.body; 
 
     try {
         const productModi = await productManagerMongo.updateProduct(pid, title, description, price, stock, code, status, category, thumbnail);
@@ -229,7 +229,7 @@ router.delete('/:pid', async (req, res) => {
             } else {
                 res.status(404).json({ message: 'Producto no encontrado' });
             }
-        } 
+        }  
     } catch (error) {
         console.error(error.message);
         if (error.message === 'No se encontró el producto') {

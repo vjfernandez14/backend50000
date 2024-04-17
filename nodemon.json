@@ -1,0 +1,6 @@
+{
+    "watch": [
+      "*.yaml"
+    ],
+    "exec": "node app.js"
+  } 

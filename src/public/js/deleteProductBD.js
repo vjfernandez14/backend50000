@@ -3,7 +3,7 @@ function deleteProductBD(productId) {
     fetch(`/api//product/${productId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json'  
       }
     })
     .then(response => {

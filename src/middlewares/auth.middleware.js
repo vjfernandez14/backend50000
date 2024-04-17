@@ -16,7 +16,26 @@
         }
     }   
 
+    const isPremiumUser = (req, res, next) => {
+        if (req.user && req.user.role === 'premium') {
+            return next();
+        } else {
+            return res.status(403).json({ message: 'Acceso no autorizado, solo usuarios premium' });
+        }
+    }
+    
+    const isAdminOrPremiumUser = (req, res, next) => {
+        if (req.user && (req.user.role === 'admin' || req.user.role === 'premium')) {
+            return next();
+        } else {
+            return res.status(403).json({ message: 'Acceso no autorizado, solo admin o usuarios premium' });
+        }
+    };
+
     module.exports = {
         isAdmin,
         isUser,
+        isPremiumUser,
+        isAdminOrPremiumUser
+
     }
