@@ -84,7 +84,7 @@ const initializePassport = () => {
 passport.use('login', new LocalStrategy(
     {usernameField: 'email'},
      async ( username, password, done) => {
-        //usersDao = new UsersDao
+        usersDao = new UsersDao
         try {
             const user = await getUsers({email: username})
             
@@ -151,7 +151,7 @@ passport.serializeUser((user, done) => {
 
   passport.deserializeUser(async (id, done) => {
     userDao = new UsersDao
-    const user = userDao.find(id)
+    const user = userDao.find({_id: id})
     done(null, user) 
   })
 

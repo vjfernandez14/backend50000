@@ -18,7 +18,7 @@ class UsersDao {
        return await Users.findOne(query)
     }
 
-    async delete(){
+    async delete(userId){
         return await Users.deleteOne({_id: userId})
     }
 

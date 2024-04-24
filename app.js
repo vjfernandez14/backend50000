@@ -16,7 +16,7 @@ const specs = require('./src/utils/swagger');
 
 
 
-
+ 
 const chats = []
 app.engine('handlebars', handlebars.engine({
     runtimeOptions: {
@@ -26,7 +26,7 @@ app.engine('handlebars', handlebars.engine({
 }))
 app.set('views', process.cwd() + '/src/views')  
 app.use('/docs', swaggerUIexpress.serve, swaggerUIexpress.setup(specs))
-
+ 
 
 
 app.get('/products', (req, res) => {

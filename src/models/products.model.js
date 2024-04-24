@@ -1,10 +1,10 @@
-const mongoose = require('mongoose')
-const mongoosePaginate = require('mongoose-paginate-v2')
+const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
-const productsCollection = 'products'
+const productsCollection = 'products';
 
-const productsShema = new mongoose.Schema({
-    title: String,   
+const productsSchema = new mongoose.Schema({
+    title: String,
     description: String,
     price: Number,
     stock: Number,
@@ -17,21 +17,19 @@ const productsShema = new mongoose.Schema({
     thumbnail: String,
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',           
-        default: 'admin',
+        ref: 'User',
         validate: {
-            validator: async function (value) {
-                if (!value) return true; 
+            validator: async function(value) {
+                if (!value) return true; // Permitir null o undefined
                 const user = await mongoose.model('User').findById(value);
-                return user && user.role === 'premium'; 
+                return user && user.role === 'premium';
             },
             message: 'El propietario debe ser un usuario premium.'
-        } 
+        }
     }
+});
 
-})  
+productsSchema.plugin(mongoosePaginate);
+const productsModel = mongoose.model(productsCollection, productsSchema);
 
-productsShema.plugin(mongoosePaginate)
-const productsModel = mongoose.model(productsCollection, productsShema)
-
-module.exports = productsModel
+module.exports = productsModel;
