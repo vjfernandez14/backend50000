@@ -19,9 +19,14 @@ const usersShema = new mongoose.Schema({
     cartId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'carts',
-        },  
+        },
+    documents: [{
+        name: String,
+        reference: String,
+    }],
     githubId: Number,
     githubUsername: String,
+    last_connection: Date,
 
 })
 

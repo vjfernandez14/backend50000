@@ -101,8 +101,9 @@ passport.use('login', new LocalStrategy(
             
         }
         
-        
-
+        user.last_connection = new Date()
+        await user.save()
+        console.log(user)
         if (user.email === 'adminCoder@coder.com' && user.password === 'adminCod3r123') {
             user.role = 'admin';
         }
