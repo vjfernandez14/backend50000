@@ -10,7 +10,8 @@ const UserDtoCurrent = require('../DTO/current.dto')
 const { isPremiumUser } = require('../middlewares/auth.middleware')
 const multer = require('multer')
 const upload = require('../middlewares/multer')
-
+const UsersDao = require('../dao/Users.dao')
+const Usersdao = new UsersDao
 
 const winstonLogger = logger
 
@@ -22,6 +23,61 @@ const winstonLogger = logger
 
 router.get('/singup', (req, res) => {
     res.render('singup.handlebars')
+})
+
+router.get('/', async (req,res) => {
+    try {
+       const users = await Usersdao.findAll()
+       res.render('users.handlebars', {users})
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+router.get('/admin/:uid', async (req, res) => {
+    try {
+        const { uid } = req.params;
+
+        
+        const users = await Usersdao.find({ _id: uid });
+
+        
+        res.render('role.handlebars', { users });
+    } catch (error) {
+        // Manejar cualquier error
+        console.error('Error al obtener usuarios:', error);
+        res.status(500).json({ error: 'Error al obtener usuarios' });
+    }
+});
+
+router.post('/:uid/role/:newRole', async (req, res) => {
+    try {
+        const { uid } = req.params;
+        const { newRole } = req.params; 
+        console.log(newRole)
+        const updatedUser = await Usersdao.update(uid, { role: newRole });
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.status(200).json({ message: 'Rol actualizado correctamente', user: updatedUser });
+    } catch (error) {
+        // Manejar cualquier error
+        console.error('Error al actualizar el rol del usuario:', error);
+        res.status(500).json({ error: 'Error al actualizar el rol del usuario' });
+    }
+});
+
+
+router.delete('/inactive', async (req,res) => {
+    try {
+        const inactiveUsers = await Usersdao.deleteInactiveUsers(2880);
+        console.log(inactiveUsers)
+        res.status(200).json({ message: 'Usuarios inactivos eliminados', deletedUsers: inactiveUsers })
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 })
 
 router.get('/loggerTest', (req, res) => {

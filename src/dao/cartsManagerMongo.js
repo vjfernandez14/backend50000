@@ -206,9 +206,9 @@ class CartsManager {
                     await product.save()
                     
                 }
-            })) 
+            }))  
             
-            console.log('ooo')
+            console.log(user)
             const tick = await generateTicket(cart,user)
             console.log(tick)
             cart.purchased = true

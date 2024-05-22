@@ -8,9 +8,11 @@ const transport = require('../utils/nodemailer');
 const { email } = require('../configs/client');
 const CustomError = require('../handlers/errors/custom-errors');
 const dictonaryErrors = require('../handlers/errors/enum-errors');
+const UsersDao = require('../dao/Users.dao');
 
 const cartsManager = new CartsManager('carts.json');
 const cartsManagerMongo = new CartsManagerMongo()
+const Users = new UsersDao
 
 router.get('/:cid/purchase',  (req,res) => {
     res.render('carts.handlebars')
@@ -31,10 +33,18 @@ router.post('/:cid/purchase', async (req, res) => {
             const product = myCart.products[i];
             const productManager = new ProductMangerMongo
             const newproduct = await productManager.updateProductStock(product.productId,product.stock,product.quantity)
-                break; 
+            console.log('llega')    
+            break; 
             }
 
-        const purchaseResult = await cartsManagerMongo.purchaseCart(cartId,req.user)
+            const user = await Users.find({ cartId: cartId });
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+            
+
+        const purchaseResult = await cartsManagerMongo.purchaseCart(cartId,user)
+        console.log(purchaseResult)
         await transport.sendMail({
             from: email.identifier,
             to: email.identifier,
@@ -45,10 +55,12 @@ router.post('/:cid/purchase', async (req, res) => {
             <h2>TOTAL: ${purchaseResult.amount}</h2>
             `
         })
+        console.log('envia el mail')
         await cartsManagerMongo.removeAllProductsFromCart(cartId)
         res.render('ticket.handlebars',{purchaseResult})
     } catch (error) {
-        res.status(error.code || 500).json({ error: error.message })
+        const statusCode = (typeof error.code === 'number' && error.code >= 400 && error.code < 600) ? error.code : 500;
+        res.status(statusCode).json({ error: error.message });
     }
 }) 
 
@@ -62,15 +74,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-//router.post('/', async (req, res) => {
-    //try {
-        //const newCart = await cartsManager.createCart();
-       // res.json(newCart);
-    //} catch (error) {
-       // console.error(error);
-        //res.status(500).json({ error: 'Error al crear el carrito' });
-    //}
-//});
+
  
 router.get('/', async (req, res) => {
     try {
@@ -82,15 +86,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-//router.get('/', async (req, res) => {
-    //try {
-        //const carts = await cartsManager.getCarts();
-       // res.json(carts);
-    //} catch (error) {
-        //console.error(error);
-        //res.status(500).json({ error: 'Error al obtener los carritos' });
-    //}
-//});
+
 
 router.get('/:cid', async (req, res) => {
     try {
@@ -117,16 +113,7 @@ router.get('/:cid', async (req, res) => {
     }
 });
 
-//router.get('/:cid', async (req, res) => {
-   // try {
-       // const { cid } = req.params;
-       // const cart = await cartsManager.getCartById(cid);
-        //res.json(cart);
-    //} catch (error) {
-        //console.error(error);
-        //res.status(500).json({ error: 'Error al obtener el carrito' });
-    //}
-//});
+
 
 router.post('/:cid/product/:pid', async (req, res) => {
     try { 

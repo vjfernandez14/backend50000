@@ -4,13 +4,21 @@ const mongoConnect = require('./src/db');
 const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo');
 const session = require('express-session');
+const exphbs  = require('express-handlebars'); 
+const path = require('path');
 
 
 const app = express();
 
 mongoConnect()
 
-//console.log(process.cwd())
+app.engine('handlebars', exphbs.engine({ 
+    defaultLayout: 'main',
+    layoutsDir: path.join(__dirname, 'src', 'views', 'layouts'),
+    partialsDir: path.join(__dirname, 'src', 'views', 'partials')
+}));
+app.set('view engine', 'handlebars');
+app.set('views', path.join(__dirname, 'src', 'views'));
 
 app.use(express.json())
 app.use(express.static(process.cwd() + '/src/public'))

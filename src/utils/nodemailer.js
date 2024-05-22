@@ -9,6 +9,9 @@ const transport = nodemailer.createTransport({
     user: email.identifier,
     pass: email.password,
   },
+  tls: {
+    rejectUnauthorized: false
+  }
 })
 
 module.exports = transport

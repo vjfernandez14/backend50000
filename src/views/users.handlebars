@@ -28,35 +28,18 @@
   </div>
 </nav>
 
-<div class="container-cart">
-
-    <h1>Carro de compra</h1>
-
-    <div class="row">
-        {{#each cart.products}}
-            <div class="col-md-12 mb-4"> 
-                <div class="card">
+    <div class="container mt-5">
+        <div class="row">
+            {{#each users}}
+            <div class="col-md-4">
+                <div class="card mb-4">
                     <div class="card-body">
-                        <h5 class="card-title col-md-4">Nombre: {{this.productId.title}}</h5>
-                        <p class="card-text col-md-4">Precio: {{this.productId.price}}</p>
-                        <p class="card-text col-md-4">Cantidad: {{this.quantity}}</p>
-                        <hr>
-                
-                        
-                        <button onclick="eliminarProducto('{{../cart._id}}', '{{this.productId._id}}')" class="btn btn-danger">Eliminar</button>
-
+                        <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
+                        <p class="card-text"><strong>Email:</strong> {{this.email}}</p>
+                        <p class="card-text"><strong>Role:</strong> {{this.role}}</p>
+                        <p class="card-text"><strong>Last Connection:</strong> {{this.last_connection}}</p>
                     </div>
                 </div>
             </div>
-        {{/each}}
-
-        <div class="col-md-12">
-            <h2>Total: {{total}}</h2>
-            <form action="/api/carts/{{cart._id}}/purchase" method="POST">
-                <button type="submit" class="btn btn-success">Finalizar compra</button>
-            </form>
+            {{/each}}
         </div>
-    </div>
-</div>
-
-<script type="text/javascript" src="/js/deleteProduct.js"></script>

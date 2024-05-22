@@ -15,7 +15,7 @@ class ProductMangerMongo {
             if (existingProduct) {
                 throw new Error('Ya existe un producto con el mismo código');
             }
-
+ 
            
             const newProduct = new productsModel({
                 title,
@@ -124,6 +124,25 @@ class ProductMangerMongo {
             return product.toObject(); 
         } catch (error) {
             throw new Error(`Error al eliminar producto: ${error.message}`);
+        }
+    }
+
+    async getProductOwnerFromDatabase(pid) {
+        try {
+            
+            const product = await productsModel.findById(pid);
+    
+            if (!product) {
+                return null;
+            }
+    
+            const productOwner = product.owner;
+    
+            return productOwner;
+        } catch (error) {
+            
+            console.error('Error al obtener el propietario del producto:', error);
+            throw error;
         }
     }
 }

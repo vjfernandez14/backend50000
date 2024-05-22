@@ -18,6 +18,10 @@ class UsersDao {
        return await Users.findOne(query)
     }
 
+    async findAll() {
+        return await Users.find()
+    }
+
     async delete(userId){
         return await Users.deleteOne({_id: userId})
     }
@@ -40,6 +44,32 @@ class UsersDao {
             throw error;
         }
     }
+
+    async deleteInactiveUsers(inactivityPeriodMinutes) {
+        const inactivityPeriod = new Date(Date.now() - inactivityPeriodMinutes * 60 * 1000);
+        try {
+            console.log(inactivityPeriod)
+            const inactiveUsers = await this.find({ last_connection: { $lt: inactivityPeriod } });
+            console.log(inactiveUsers)
+            const deletedUsers = await Promise.all(inactiveUsers.map(async (user) => {
+                await this.delete(user._id);
+                await transport.sendMail({
+                    from: email.identifier,
+                    to: user.email,
+                    subject: 'Cuenta Eliminada por Inactividad',
+                    html: `
+                        <h1>Hola ${user.first_name},</h1>
+                        <p>Tu cuenta ha sido eliminada debido a inactividad.</p>
+                    `
+                });
+                return user;
+            }));
+            return deletedUsers;
+        } catch (error) {
+            throw new Error('Error al eliminar usuarios inactivos: ' + error.message);
+        }
+    }
+    
 }
 
 module.exports = UsersDao

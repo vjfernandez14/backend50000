@@ -1,60 +1,95 @@
-<div class="row">
-    <div class="col-md-6 mt-6">
-        <h2>{{query}}</h2>
-        <h3>Bienvenido {{user.first_name}} {{user.last_name}} </h3>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+        <img class="navImage" src="/imagenes/logoCard.png" alt="Logo">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/api/users/login">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/products">Productos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/users/login/current">Administrador</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/users">Usuarios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/carts/{{user.cartId}}"><img class="navImage2" src="/imagenes/cartIcon.png" alt=""></a>
+        </li>
+      </ul>
     </div>
-    <div class="col-md-3">
-        <h3> Eres:{{user.role}} </h3>
-    </div>
-    <div class="col-md-3">
-        <button id="logout" type="button" class="btn btn-danger w-100">
-  <i class="bi bi-box-arrow-right"></i>Logout
-</button>
-        
-    </div>
-</div>
+  </div>
+</nav>
 
- 
+<div class="container-products">
 
-<script src="/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="/js/products.js"></script>
-<script type="text/javascript" src="/js/logout.js"></script>
 
-<div class="row">
-    {{#each telefonia}}
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Nombre: {{this.title}}</h5>
-                <p class="card-text">Precio: {{this.price}}</p>
-                <p class="card-text">Descripción: {{this.description}}</p>
-                <p class="card-text">Stock: {{this.stock}}</p>
+        <div class="row">
+            <div class="col-md-6 mt-6">
+                <h2>{{query}}</h2>
+                <h3>Bienvenido {{user.first_name}} {{user.last_name}} </h3>
+            </div>
+            <div class="col-md-3">
+                <h3> Eres:{{user.role}} </h3>
+            </div>
+            <div class="col-md-3">
+                <button id="logout" type="button" class="btn btn-danger w-100">
+        <i class="bi bi-box-arrow-right"></i>Logout
+        </button>
                 
-                <form action="/api/carts/{{../user.cartId}}/product/{{this._id}}" method="POST">
-                    <div class="form-group">
-                        <label for="quantity">Cantidad:</label>
-                        <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="{{this.stock}}">
-                    </div>
-                    <input type="hidden" name="productId" value="{{this._id}}">
-                    <input type="hidden" name="productName" value="{{this._id}}">
-                    <input type="hidden" name="stock" value="{{this.stock}}">
-                    <button type="submit" class="btn btn-primary">Agregar al carrito</button>
- 
-                </form>
-                <button class="btn btn-danger" data-product-id="{{this._id}}" onclick="deleteProductBD({{this._id}})">Eliminar</button>
             </div>
         </div>
-    </div>
-{{/each}}
-</div>
+
+        
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/js/products.js"></script>
+        <script type="text/javascript" src="/js/logout.js"></script>
+
+        <div class="row">
+            {{#each telefonia}}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{{this.thumbnail}}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">Nombre: {{this.title}}</h5>
+                        <p class="card-text">Precio: {{this.price}}</p>
+                        <p class="card-text">Descripción: {{this.description}}</p>
+                        <p class="card-text">Stock: {{this.stock}}</p>
+                        
+                        <form action="/api/carts/{{../user.cartId}}/product/{{this._id}}" method="POST">
+                            <div class="form-group">
+                                <label for="quantity">Cantidad:</label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="{{this.stock}}">
+                            </div>
+                            <input type="hidden" name="productId" value="{{this._id}}">
+                            <input type="hidden" name="productName" value="{{this._id}}">
+                            <input type="hidden" name="stock" value="{{this.stock}}">
+                            <button id="btn-login" type="submit" class="btn btn-primary">Agregar al carrito</button>
+        
+                        </form>
+                        <button id="btn-delete" class="btn btn-danger" data-product-id="{{this._id}}" onclick="deleteProductBD({{this._id}})">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+        </div>
 
 
-<div>
-  {{#if hasPrevPage}}
-    <a href="/api/products/?query={{query}}&limit={{limit}}&page={{prevPage}}"><button>Anterior</button></a>
-  {{/if}}
+        <div>
+        {{#if hasPrevPage}}
+            <a href="/api/products/?query={{query}}&limit={{limit}}&page={{prevPage}}"><button>Anterior</button></a>
+        {{/if}}
 
-  {{#if hasNextPage}}
-    <a href="/api/products/?query={{query}}&limit={{limit}}&page={{nextPage}}"><button>Siguiente</button></a>
-  {{/if}}
+        {{#if hasNextPage}}
+            <a href="/api/products/?query={{query}}&limit={{limit}}&page={{nextPage}}"><button>Siguiente</button></a>
+        {{/if}}
+        </div>
 </div>

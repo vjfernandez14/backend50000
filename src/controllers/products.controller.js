@@ -5,14 +5,17 @@ const mongoosePaginate = require('mongoose-paginate-v2')
 
 
 
-
+const mongoose = require('mongoose')
 const productsMangerMongo = require('../dao/productsMangerMongo')
 const ProductManager = require('../../ProductManager');
 const productsModel = require('../models/products.model');
 const messagesModel = require('../models/messages.model');
 const { isAdmin } = require('../middlewares/auth.middleware')
 const { generateProducts } = require('../utils/product-mock.util')
-
+const transport = require('../utils/nodemailer')
+const UsersDao = require('../dao/Users.dao')
+const { email } = require('../configs/client')
+const userDao = new UsersDao
 
 
 const productManager = new ProductManager('products.json');
@@ -89,58 +92,7 @@ router.get('/mockingproducts', async (req,res) => {
     }
 })
 
-//router.get('/', async (req, res) => {
-    //try{
-        //const products = await productManagerMongo.getProducts()
-       // console.log(products)
-   // }catch(error){
-       // console.log(error)
-    //}
-//})
 
-
-
-//router.get('/', async (req,res)=>{
-//
-    //try {
-     // //  const { limit } = req.query;
-//
-       // const products = await productManager.getProducts();
-//
-       // if (limit) {
-       //     const limitedProducts = products.slice(0, parseInt(limit, 10));
-       //     return res.json(limitedProducts);
-       // } 
-       //     return res.json(products);
-      //  
-   // } catch (error) {
-     //   console.error(error);
-     //   res.status(500).json({ error: 'Error al obtener los productos' });
-    //}
-//})
-
- 
-
-
-
-    //router.get('/:pid', async (req,res)=>{  
-
-    //try {
-      //  const { pid } = req.params;
-        
-       
-        //const product = await productManager.getProductById(Number(pid));
-        //console.log(product)
-        //if (product) {
-           //return res.json(product);
-        //} else {
-            //res.status(404).json({ error: 'Producto no encontrado' });
-        //}
-    //} catch (error) {
-       // console.error(error);
-       // res.status(500).json({ error: 'Error al obtener el producto' });
-    //}
-//})
 
 router.get('/updateProducts', isAdmin, (req, res) => {
     res.render('admin.handlebars')    
@@ -161,19 +113,7 @@ router.post('/updateProducts',   async (req, res) => {
         res.status(500).json({ error: error.message });
     }    
 });
-//router.post('/', async (req,res) =>{
-    //try {
-     // const {title,description, price, thumbnail, stock, code, status = true, category} = req.body
-   //
-      //const check = await productManager.addProduct(title,description,price,stock,code,status,category,thumbnail)
-      //if(check){      
-       // res.send('Producto cargado')
-     // }
-   // } catch(error) {    
-     // res.status(500).json({error: error.message})
-   // }
-    
-  //})
+
 
   router.put('/:pid', async (req, res) => {
     const { pid } = req.params;
@@ -196,41 +136,42 @@ router.post('/updateProducts',   async (req, res) => {
     }
 });
 
- // router.put('/:pid', async (req, res) => {
-   // const { pid } = req.params;
-    //const { title, description, price, thumbnail, stock, code, status = true, category } = req.body;
+ 
 
-    //try {
-        //const productModi = await productManager.updateProduct(Number(pid), title, description, price, stock, code, status, category, thumbnail);
-        //if (productModi) {
-          //  res.json({ message: 'Product updated', product: productModi });
-       // } else {
-        //    res.status(404).json({ message: 'Product not found' });
-        //}
-    //} catch (error) {
-       // console.error(error.message);
-       // if (error.message === 'No se encontró el producto') {
-       //     res.status(404).json({ message: 'Product not found' });
-        //} else {
-       //     res.status(500).json({ message: 'Internal Server Error' });
-       // }
-    //}
-//});
 
 router.delete('/:pid', async (req, res) => {
     const { pid } = req.params;
-    const userRole = req.session.user.role;
+    
     try {
-        if(userRole === 'admin' || (userRole === 'premium' && product.owner === req.user._id)) { 
-            
-            const productDelete = await productManagerMongo.deleteProduct(pid);
-            if (productDelete) {
-                res.json({ message: 'Producto eliminado', product: productDelete });
-            } else {
-                res.status(404).json({ message: 'Producto no encontrado' });
-            }
-        }  
-    } catch (error) {
+        const product = await productManagerMongo.getProductById(pid)
+        console.log(product)
+        if (!product) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+
+        const ownerId = product.owner; 
+        const owner = await userDao.find({ _id: ownerId });
+        console.log(owner)
+        if (!owner) {
+            return res.status(404).json({ message: 'Propietario del producto no encontrado' });
+        }
+
+        const productDelete = await productManagerMongo.deleteProduct(pid)
+        if (productDelete) {
+            if (owner.role === 'premium') {
+                try {
+                    await transport.sendMail({
+                        from: email.identifier,
+                        to: owner.email,
+                        subject: 'Producto Eliminado',
+                        html: `<p>Hola ${owner.first_name},</p><p>Tu producto "${product.title}" ha sido eliminado del catálogo.</p>`
+                    });
+                } catch (error) {
+                    console.error('Error al enviar el correo electrónico:', error);
+                }
+            } }
+        console.log(productDelete)
+     } catch (error) {
         console.error(error.message);
         if (error.message === 'No se encontró el producto') {
             res.status(404).json({ message: 'Producto no encontrado' });
@@ -239,26 +180,6 @@ router.delete('/:pid', async (req, res) => {
         }
     }
 });
-
-//router.delete('/:pid', async (req, res) => {
-    //const { pid } = req.params;
-
-   // try {
-       // const productDelete = await productManager.deleteProduct(Number(pid));
-       // if (productDelete) {
-          //  res.json({ message: 'Product deleted', product: productDelete });
-        //} else {
-           // res.status(404).json({ message: 'Product not found' });
-        //}
-    //} catch (error) {
-       // console.error(error.message);
-        //if (error.message === 'No se encontró el producto') {
-           // res.status(404).json({ message: 'Product not found' });
-        //} else {
-          //  res.status(500).json({ message: 'Internal Server Error' });
-        //}
-    //}
-//});
 
 
 

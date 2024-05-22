@@ -1,0 +1,64 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+        <img class="navImage" src="/imagenes/logoCard.png" alt="Logo">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/api/users/login">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/products">Productos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/users/login/current">Administrador</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/users">Usuarios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/carts/{{user.cartId}}"><img class="navImage2" src="/imagenes/cartIcon.png" alt=""></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+    
+    
+    <div class="container mt-5">
+        <div class="row">
+            {{#each users}}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
+                        <p class="card-text"><strong>Email:</strong> {{this.email}}</p>
+                        <p class="card-text"><strong>Role:</strong> {{this.role}}</p>
+                        <p class="card-text"><strong>Last Connection:</strong> {{this.last_connection}}</p>
+                        <p class="card-text">Cambia el role segun corresponda</p>
+                            <form id="updateRoleForm" action="/api/users/{{this._id}}/role/admin" method="POST">
+                                <button id="btn-login" type="submit" class="btn btn-primary">Admin</button>
+                            </form>
+                            <form id="updateRoleForm" action="/api/users/{{this._id}}/role/user" method="POST">
+                                <button id="btn-login" type="submit" class="btn btn-primary">User</button>
+                            </form>
+                            <form id="updateRoleForm" action="/api/users/{{this._id}}/role/premium" method="POST">
+                                <button id="btn-login" type="submit" class="btn btn-primary">Premium</button>
+                            </form>
+                                </form>
+                        <!-- Botón para eliminar el usuario -->
+                        <form action="/api/users/{{this._id}}/delete" method="POST">
+                            <button type="submit" class="btn btn-danger mt-2">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/js/role.js"></script>

@@ -1,3 +1,36 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+        <img class="navImage" src="/imagenes/logoCard.png" alt="Logo">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/api/users/login">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/products">Productos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/users/login/current">Administrador</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/users">Usuarios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/carts/{{user.cartId}}"><img class="navImage2" src="/imagenes/cartIcon.png" alt=""></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="login-container">
+
 <h2>Iniciar sesion</h2>
 
  <div class="container col-md-12">
@@ -17,17 +50,20 @@
             </div>
         </div>
     <div class="row">
-        <div class="col-md-2 mt-2">
-           <button type="submit" class="btn btn-primary" >Iniciar Sesion</button>
+        <div class="col-md-12">
+
+        <div class="col-md-3 ">
+           <button type="submit" id="btn-login" class="btn btn-primary" >Iniciar Sesion</button>
         </div> 
 
-        <div class="col-md-2 mt-2">
-           <button type="submit" class="btn btn-warning" ><a href="/api/users/login/forgot">Recuperar contraseña</a></button>
+        <div class="col-md-3">
+           <button type="submit" id="btn-forgot" class="btn btn-warning" ><a href="/api/users/login/forgot">Recuperar contraseña</a></button>
         </div>
 
-        <div class="col-md-2 mt-2">
-           <button  type="submit" class="btn btn-warning" > <a href="/api/users/login/github"> Iniciar Sesion con Github</a></button>
+        <div >
+           <button  type="submit" id="btn-git" class="btn btn-warning" > <a href="/api/users/login/github"> Iniciar Sesion con Github</a></button>
         </div> 
+        </div>
 
         </div>
                 
@@ -35,3 +71,4 @@
         </div>
     </form>
  </div>
+</div>
