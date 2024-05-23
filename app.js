@@ -1,7 +1,7 @@
 const express = require('express')
 const app = require('./server')
 const handlebars = require('express-handlebars')
-const port = 8080;  
+const port = process.env.PORT || 8080;  
 const {Server} = require('socket.io')
 const router = require('./src/router/index')
 const axios = require('axios');
